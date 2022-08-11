@@ -1,0 +1,5210 @@
+---
+openapi: 3.0.0
+info:
+  version: 0.0.0
+  title: Vinymatic API
+  description: ""
+host: localhost:5000
+basePath: ""
+tags: []
+schemes: []
+securityDefinitions: {}
+consumes: []
+produces: []
+paths:
+  "/maj/vinyls/tracks":
+    patch:
+      tags:
+        - __Scraping
+      description: "Scrap les tracks et les met à jour."
+      parameters:
+        - name: idEntity
+          description: "Correspond à ___idRelease___ et non à ___id___."
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Updated
+        "500":
+          description: Internal Server Error
+  "/maj/{entity}/images":
+    patch:
+      tags:
+        - __Scraping
+      description: "Scrap les images et les met à jour."
+      parameters:
+        - name: entity
+          in: path
+          description: "Valeurs disponibles: ___release___/___artist___/___master___) __/!\\ LA VALEUR ___vinyl___ NE FONCTIONNERA PAS /!\\__."
+          required: true
+          example: release
+          schema:
+            type: string
+        - name: idEntity
+          description: "Correspond à ___idRelease___, par exemple, et non à ___id___"
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Updated
+        "500":
+          description: Internal Server Error
+# Login ✔︎
+  "/registration":
+    post:
+      tags:
+      - Registation / Login
+      description: "Execution de l'enregistrement du nouvelle utilisateur."
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/requestBodies/AddUser"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              type: object
+              properties:
+                userID: 
+                  type: integer
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+                token:
+                  type: string
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+  # "/third-part-registration":
+  #   post:
+  #     tags:
+  #     - Registation / Login
+  #     description: "Execution de l'enregistrement du nouvelle utilisateur avec ses identifiants Google ou Apple.<br><br> - Le champ ___token___ est obligatoire.<br> - Le chame ___appleUser___ est facultatif: il conserne la parti __user__ dur retout de l'API d'Apple uniquement si il existe."
+  #     requestBody:
+  #       content:
+  #         application/json:
+  #           schema:
+  #             type: object
+  #             properties:
+  #               token: 
+  #                 type: string
+  #               appleUser:
+  #                 type: string
+  #             required:
+  #               - token
+  #     responses:
+  #       "201":
+  #         description: Created
+  #         content:
+  #           application/json:
+  #             type: object
+  #             properties:
+  #               userID: 
+  #                 type: integer
+  #               firstName:
+  #                 type: string
+  #               lastName:
+  #                 type: string
+  #               token:
+  #                 type: string
+  #       "400":
+  #         description: Bad Request
+  #       "401":
+  #         description: Unauthorized
+  #       "404":
+  #         description: Not Found
+  #       "500":
+  #         description: Internal Server Error
+  "/login":
+    post:
+      tags:
+      - Registation / Login
+      description: ""
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: "#/components/requestBodies/Login"
+              - type: object
+                properties:
+                  password:
+                    type: string
+                  token:
+                    type: string
+                  appleCode:
+                    type: string
+      parameters:
+      - name: useBundleId
+        in: query
+        schema: 
+          type: boolean
+      responses:  
+        "200":
+          description: OK
+          content:
+            application/json:
+              type: object
+              properties:
+                token: 
+                  type: string
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+  "/registration-request":
+    post:
+      tags:
+      - Registation / Login
+      description: ""
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/requestBodies/RegistrationRequest"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              type: object
+              properties:
+                smsId: 
+                  type: string
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+  "/password-reset-request":
+    post:
+      tags:
+      - Registation / Login
+      description: ""
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/requestBodies/RegistrationRequest"
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+  "/password-reset":
+    patch:
+      tags:
+      - Registation / Login
+      description: ""
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: "#/components/requestBodies/Login"
+              - type: object
+                properties:
+                  newPassword:
+                    type: string
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+  "/refresh-token":
+    patch:
+      tags:
+      - Registation / Login
+      description: "genarate new token from a valid token"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              type: object
+              properties:
+                token: 
+                  type: string
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+  "/verify-code":
+    patch:
+      tags:
+      - Registation / Login
+      description: "L'utilisation se fait soit avec \"__email__\" soit avec \"__smsId__\"."
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                smsId:
+                  type: string
+                code:
+                  type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              example: true
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+# ModifEntityRequest
+  "/modif-entity-requests":
+    get:
+      tags:
+      - Modif Entity Requests
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/pageParam"
+      - $ref: "#/components/parameters/limitParam"
+      responses:
+        "200":
+          description: OK
+          # content:
+          #   application/json:
+          #     schema:
+          #       $ref: "#/components/schemas/Artists"
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+    post:
+      tags:
+      - Modif Entity Requests
+      description: ""
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                entity: 
+                  type: string
+                idEntity: 
+                  type: integer
+                body: 
+                  type: object
+                query: 
+                  type: object
+                images:
+                  type: string
+                  format: binary
+                thumbnail:
+                  type: string
+                  format: binary
+                profilImage:
+                  type: string
+                  format: binary
+                coverImage:
+                  type: string
+                  format: binary
+                audios:
+                  type: string
+                  format: binary
+                videos:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: OK
+          # content:
+          #   application/json:
+          #     schema:
+          #       $ref: "#/components/schemas/Artists"
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/modif-entity-request/{id}":
+    get:
+      tags:
+      - Modif Entity Requests
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/idParam"
+      responses:
+        "200":
+          description: OK
+          # content:
+          #   application/json:
+          #     schema:
+          #       $ref: "#/components/schemas/Artists"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/modif-entity-request/{id}/checked":
+    patch:
+      tags:
+      - Modif Entity Requests
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/idParam"
+      responses:
+        "200":
+          description: OK
+          # content:
+          #   application/json:
+          #     schema:
+          #       $ref: "#/components/schemas/Artists"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/contributors/{entity}/{id}":
+    get:
+        tags:
+        - Modif Entity Requests
+        description: ""
+        parameters:
+        - name: entity
+          in: path
+          required: true
+          schema:
+            format: string
+        - name: id
+          in: path
+          required: true
+          schema:
+            format: integer
+        responses:
+          "200":
+            description: OK
+          "401":
+            description: Unauthorized
+          "404":
+            description: Not Found
+          "500":
+            description: Internal Server Error
+        security:
+        - bearerAuth: []
+  "/modif-entity-request":
+    get:
+      tags:
+      - Modif Entity Requests
+      description: "Permet de lire les fichiers contenu dans le bucket de modification"
+      parameters:
+      - name: url
+        in: query
+        description: "Correspond au l'URLs stockées dans le champs ___body___"
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+# Artist ✔︎
+  "/artists":
+    get:
+      tags:
+      - Artist
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/pageParam"
+      - $ref: "#/components/parameters/limitParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Artists"
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+    post:
+      tags:
+      - Artist
+      description: ""
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/requestBodies/AddArtist"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Artist"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/artists/search":
+    get:
+      tags:
+      - Artist
+      - Search
+      description: ""
+      parameters: 
+      - $ref: "#/components/parameters/searchField"
+      - $ref: "#/components/parameters/searchValue"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Artists"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/artist/{id}":
+    get:
+      tags:
+      - Artist
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/idParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Artist"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+    patch:
+      tags:
+      - Artist
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/idParam"
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/requestBodies/AddArtist"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Artist"
+        "304":
+          description: Not Modified
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/artist/{id}/discography":
+    get:
+      tags:
+      - Artist
+      description: ""
+      parameters:
+      - name: counting
+        in: query
+        schema:
+          type: boolean
+      - name: groupBy
+        in: query
+        description: "Valeurs possibles: __albums__, __singles__ et __compilations__" 
+        schema:
+          type: string
+      - $ref: "#/components/parameters/idParam"
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+# Audio ✔︎
+  "/audios":
+    get:
+      tags:
+      - Audio
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/pageParam"
+      - $ref: "#/components/parameters/limitParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Audios"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/audio/{id}":
+    get:
+      tags:
+      - Audio
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/idParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Audio"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+    patch:
+      tags:
+      - Audio
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/idParam"
+      - $ref: "#/components/parameters/typeAudioParams"
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/requestBodies/AddAudio"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Audio"
+        "304":
+          description: Not Modified
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/song/{id}":
+    post:
+      tags:
+      - Audio
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/idParam"
+      - $ref: "#/components/parameters/typeAudioParams"
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/requestBodies/AddSongFile"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id: 
+                    type: integer
+                  title: 
+                    type: string
+                  audioUrl: 
+                    type: string
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/song/{typeAudio}/{key}":
+    get:
+      tags:
+      - Audio
+      description: "Le chemin correspond au chemin qui mène au ficher dans AWS S3"
+      produces:
+      - audio/*
+      parameters:
+      - name: typeAudio
+        description: "Correspond au type de l'audio. (valeurs possible: ___songs___)."
+        example: songs        
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: key
+        description: "Correspond au nom du fichier audio."
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: isGetDuration
+        description: "Récupérer la ___duration___ du ficher audio stocké dans AWS S3"
+        example: true
+        in: query
+        schema:
+          type: boolean
+      responses:
+        "200":
+          description: OK
+          content:
+            audio/*:
+              type: string
+              format: base64
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+# Format ✔︎
+  "/formats":
+    get:
+      tags:
+      - Format
+      description: ""
+      parameters: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Formats"
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+    post:
+      tags:
+      - Format
+      description: ""
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/requestBodies/AddFormat"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Formats"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/format/{id}":
+    get:
+      tags:
+      - Format
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/idParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Format"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+    patch:
+      tags:
+      - Format
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/idParam"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/requestBodies/AddFormat"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Format"
+        "304":
+          description: Not Modified
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+# Genre ✔︎
+  "/genres":
+    get:
+      tags:
+      - Genre
+      description: ""
+      parameters: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Genres"
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/genre/{id}":
+    get:
+      tags:
+      - Genre
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/idParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Genre"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/genre/{nameGenre}/styles":
+    get:
+      tags:
+      - Genre
+      description: ""
+      parameters:
+      - name: nameGenre
+        in: path
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StyleInGenre"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+# Image ✔︎
+  # "/images":
+  #   post:
+  #     ignore: true
+  #     tags:
+  #     - Image
+  #     description: ""
+  #     parameters:
+  #     - name: obj
+  #       in: body
+  #       schema:
+  #         type: object
+  #         properties:
+  #           titre:
+  #     responses:
+  #       "200":
+  #         description: OK
+  #       "401":
+  #         description: Unauthorized
+  #       "404":
+  #         description: Not Found
+  #       "500":
+  #         description: Internal Server Error
+  #     security:
+  #     - bearerAuth: []
+  "/image/{imageFrom}/{typeImage}/{key}":
+    get:
+      tags:
+      - Image
+      description: "Le chemin correspond au chemin qui mène au ficher dans AWS S3"
+      parameters:
+      - $ref: "#/components/parameters/imageFrom"
+      - $ref: "#/components/parameters/typeImage"
+      - $ref: "#/components/parameters/keyFile"
+      responses:
+        "200":
+          description: OK
+          content:
+            image/*:
+              schema: 
+                type: string
+                format: binary
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+    # delete:
+    #   tags:
+    #   - Image
+    #   description: ""
+    #   parameters:
+    #   - $ref: "#/components/parameters/imageFrom"
+    #   - $ref: "#/components/parameters/typeImage"
+    #   - $ref: "#/components/parameters/keyFile"
+    #   responses:
+    #     "204":
+    #       description: Deleted
+    #     "401":
+    #       description: Unauthorized
+    #     "404":
+    #       description: Not Found
+    #     "500":
+    #       description: Internal Server Error
+    #   security:
+    #   - bearerAuth: []
+# Label ✔︎
+  "/labels":
+    get:
+      tags:
+      - Label
+      description: ""
+      parameters: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Labels"
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+    post:
+      tags:
+      - Label
+      description: ""
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/requestBodies/AddLabel"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Label"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/label/{id}":
+    get:
+      tags:
+      - Label
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/idParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Label"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+    patch:
+      tags:
+      - Label
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/idParam"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/requestBodies/AddLabel"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Label"
+        "304":
+          description: Not Modified
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/label/name/{name}":
+    get:
+      tags:
+      - Label
+      description: ""
+      parameters:
+      - name: name
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Label"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/labels/roleSocietes":
+    get:
+      tags:
+      - Label
+      description: ""
+      parameters: []
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/identifiers/types":
+    get:
+      tags:
+      - Label
+      description: ""
+      parameters: []
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+# Master ✔︎
+  "/masters":
+    get:
+      tags:
+      - Master
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/pageParam"
+      - $ref: "#/components/parameters/limitParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Masters"
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+    post:
+      tags:
+      - Master
+      description: ""
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/requestBodies/AddMaster"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Master"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/masters/search":
+    get:
+      tags:
+      - Master
+      - Search
+      description: ""
+      parameters: 
+      - $ref: "#/components/parameters/searchField"
+      - $ref: "#/components/parameters/searchValue"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Masters"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/master/{id}":
+    get:
+      tags:
+      - Master
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/idParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Master"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+    patch:
+      tags:
+      - Master
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/idParam"
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/requestBodies/AddMaster"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Master"
+        "304":
+          description: Not Modified
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/master/{id}/versions":
+    get:
+      tags:
+      - Master
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/idParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VinylsByMaster"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+# Transporters ✔︎
+  "/transporters":
+    get:
+      tags:
+      - Transporters
+      description: ""
+      parameters: 
+      - $ref: "#/components/parameters/pageParam"
+      - $ref: "#/components/parameters/limitParam"
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+    post:
+      tags:
+      - Transporters
+      description: ""
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/requestBodies/AddTransporter"
+      responses:
+        "201":
+          description: Created
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []      
+  "/transporter/{id}":
+    patch:
+      tags:
+      - Transporters
+      description: ""
+      parameters: 
+      - name: id
+        in: path
+        require: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/requestBodies/AddTransporter"
+      responses:
+        "200":
+          description: Updated
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+# PlayList ✔︎
+  "/playlists":
+    get:
+      tags:
+      - Playlist
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/pageParam"
+      - $ref: "#/components/parameters/limitParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlaylistsWithOwn"
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/playlists/search":
+    get:
+      tags:
+      - Playlist
+      - Search
+      description: ""
+      parameters: 
+      - $ref: "#/components/parameters/searchField"
+      - $ref: "#/components/parameters/searchValue"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlaylistsWithOwn"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/playlist/{id}":
+    get:
+      tags:
+      - Playlist
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/idParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlaylistWithOwn"
+          
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/playlist/{id}/likes":
+    get:
+      tags:
+      - Playlist
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/idParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlaylistLikes"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+# Sell ✔︎
+  "/sellings":
+    get:
+      tags:
+      - Sell
+      description: ""
+      parameters: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Sells"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+# Store ✔︎
+  "/stores":
+    get:
+      tags:
+      - Store
+      description: ""
+      parameters: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Stores"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+    post:
+      tags:
+      - Store
+      description: ""
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/requestBodies/AddStore"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Store"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/store/{id}":
+    get:
+      tags:
+      - Store
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/idParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Store"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+    # patch:
+    #   tags:
+    #   - Store
+    #   description: ""
+    #   parameters:
+    #   - $ref: "#/components/parameters/idParam"
+    #   requestBody:
+    #     content:
+    #       application/json:
+    #         schema:
+    #           $ref: "#/components/requestBodies/AddStore"
+    #   responses:
+    #     "200":
+    #       description: OK
+    #       content:
+    #         application/json:
+    #           schema:
+    #             $ref: "#/components/schemas/Store"
+    #     "304":
+    #       description: Not Modified
+    #     "400":
+    #       description: Bad Request
+    #     "401":
+    #       description: Unauthorized
+    #     "404":
+    #       description: Not Found
+    #     "500":
+    #       description: Internal Server Error
+    #   security:
+    #   - bearerAuth: []
+  "/near/store":
+    get:
+      tags:
+      - Store
+      description: "return an array of stores near by ___location___ with ___distance___"
+      parameters: 
+      - in: query 
+        name: limit
+        schema: 
+          type: integer
+      - in: query 
+        name: page
+        schema: 
+          type: integer
+      - in: query 
+        name: lat 
+        require: true
+        schema:
+          type: float
+      - in: query 
+        name: lon 
+        require: true
+        schema:
+          type: float
+      - in: query 
+        name: distance 
+        require: true
+        schema:
+          type: inetger      
+      responses:
+        "200":
+          description: OK
+      #     content:
+      #       application/json:
+      #         schema:
+      #           allOf: 
+      #           - $ref: "#/components/schemas/Stores"
+      #           - type: object 
+      #             properties:
+      #               distance: 
+      #                 type: float
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+    
+  "/store/name/{name}":
+    get:
+      tags:
+      - Store
+      description: ""
+      parameters:
+      - name: name
+        in: path
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Store"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+# Style ✔︎
+  "/styles":
+    get:
+      tags:
+      - Style
+      description: ""
+      parameters: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Styles"
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/style/{id}":
+    get:
+      tags:
+      - Style
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/idParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Style"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+# User ✔︎
+  "/users":
+    get:
+      tags:
+      - User
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/pageParam"
+      - $ref: "#/components/parameters/limitParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Users"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+    post:
+      tags:
+      - User
+      description: ""
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/requestBodies/AddUser"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/users/search":
+    get:
+      tags:
+      - User
+      - Search
+      description: "
+          Parametre ___<fieldName>___ (Valeur possible): \n\n
+            - string (ex: jzillinger)\n
+            - array of string (ex: [\"jzillinger\", \"ybenamor\"])\n\n\n
+          Parametre ___who___ : \n\n
+            - Si ___id___ & ___username___ sont renseignés, ___usename___ prendra le dessus.\n\n
+            - Si ___id___ & ___username___ ne sont pas renseignés et si le _token_ est present, la recherche se fera sur le ___usename___ du _token_.\n\n
+            - Si ___id___ & ___username___ ne sont pas renseignés et si le _token_ n'est pas present, une erreur __400__ sera générée.\n\n
+        " 
+      parameters: 
+      - in: query
+        name: username
+        description: ""
+        schema:
+          type: string
+      - in: query
+        name: showName
+        description: ""
+        schema:
+          type: string
+      - in: query
+        name: firstName
+        description: ""
+        schema:
+          type: string
+      - in: query
+        name: lastName
+        description: ""
+        schema:
+          type: string
+      
+      - in: query
+        name: what
+        description: "Permet de chercher dans ses abonné•e•s ou ses abonnements _(value: __followings__ or __followers__)_. \n\n__Ne fonctionne que si _WHO_ est reseigné.__"
+        # example: followers
+        schema:
+          type: string
+      - in: query
+        name: who[id]
+        description: "Permet de chercher sur un utilisateur en particulié par son ___id___. \n\n__Ne fonctionne que si _WHAT_ est reseigné.__"
+        # example: 1
+        schema:
+          type: integer
+      - in: query
+        name: who[username]
+        description: "Permet de chercher sur un utilisateur en particulié par son ___username___. \n\n__Ne fonctionne que si _WHAT_ est reseigné.__"
+        # example: admin
+        schema:
+          type: string
+      
+      # - $ref: "#/components/parameters/searchField"
+      # - $ref: "#/components/parameters/searchValue"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Users"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/is/pseudo/available/{username}":
+    get:
+      tags:
+      - User
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/userParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              example: true
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/user/{id}":
+    get:
+      tags:
+      - User
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/idParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+    patch:
+      tags:
+      - User
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/idParam"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/requestBodies/AddUser"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "304":
+          description: Not Modified
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+    delete:
+      tags:
+      - User
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/idParam"
+      responses:
+        "204":
+          description: No Content
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/user/{id}/username":
+    get:
+      tags:
+      - User
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/idParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UsernameOfUser"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/user/{id}/playlists":
+    get:
+      tags:
+      - User
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/idParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlaylistOfUser"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/user/{id}/followings":
+    get:
+      tags:
+      - User
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/idParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FollowingsOfUser"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/user/{id}/followers":
+    get:
+      tags:
+      - User
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/idParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FollowersOfUser"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/user/{id}/collection":
+    get:
+      tags:
+      - User
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/idParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CollectionOfUser"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/user/{id}/wishlist":
+    get:
+      tags:
+      - User
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/idParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WishlistOfUser"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/wishlist/vinyl/{id}/user/{userId}":
+    get:
+      tags:
+      - User
+      description: ""
+      parameters:
+      - name: id
+        in: path
+        require: true
+        schema: 
+          type: integer
+      - name: userId
+        in: path
+        require: true
+        schema: 
+          type: integer
+      responses:
+        "200":
+          description: Created
+
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/collection/vinyl/{id}/user/{userId}":
+    get:
+      tags:
+      - User
+      description: ""
+      parameters:
+      - name: id
+        in: path
+        require: true
+        schema: 
+          type: integer
+      - name: userId
+        in: path
+        require: true
+        schema: 
+          type: integer
+      responses:
+        "200":
+          description: Created
+
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+# Video ✔︎
+  "/videos":
+    get:
+      tags:
+      - Video
+      description: ""
+      # parameters:
+      # - $ref: "#/components/parameters/pageParam"
+      # - $ref: "#/components/parameters/limitParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MinOfVideo"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+    post:
+      tags:
+      - Video
+      description: ""
+      parameters:
+        - name: idArtist
+          in: query
+          schema:
+            type: integer
+        - name: idUser
+          in: query
+          schema:
+            type: integer
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              allOf:
+              - $ref: "#/components/requestBodies/AddVideo"
+              - type: object
+                properties: 
+                  videoFile:
+                    type: string
+                    format: binary
+                  image:
+                    type: string
+                    format: binary
+      responses:
+        "201":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MinOfVideo"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/video/search":
+    get:
+      tags:
+      - Video
+      - Search
+      description: ""
+      parameters: 
+      - in: query
+        name: title
+        description: Utiliser le ___"title"___ de la video.
+        schema:
+          type: string
+      - in: query
+        name: artist
+        description: Utiliser le ___"name"___ de l'artist.
+        schema:
+          type: string
+      - in: query
+        name: user
+        description: Utiliser le ___"username"___ de l'utilisateur.
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/video/{id}":
+    get:
+      tags:
+      - Video
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/idParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MinOfVideo"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+    patch:
+      tags:
+      - Video
+      description: ""
+      parameters:
+        - $ref: "#/components/parameters/idParam"
+        - name: idArtist
+          in: query
+          schema:
+            type: integer
+        - name: idUser
+          in: query
+          schema:
+            type: integer
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              allOf:
+              - $ref: "#/components/requestBodies/AddVideo"
+              - type: object
+                properties: 
+                  image:
+                    type: string
+                    format: binary
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MinOfVideo"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+    delete:
+      tags:
+      - Video
+      description: ""
+      parameters:
+        - $ref: "#/components/parameters/idParam"
+      responses:
+        "204":
+          description: Deleted
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+# Vinyl ✔︎
+  "/vinyls":
+    get:
+      tags:
+      - Vinyl
+      description: ""
+      parameters:
+      - name: releaseDate
+        in: query
+        schema:
+          type: string
+      - name: country
+        in: query
+        schema:
+          type: string
+      - name: label
+        in: query
+        schema:
+          type: string
+      - $ref: "#/components/parameters/pageParam"
+      - $ref: "#/components/parameters/limitParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Vinyls"
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+    post:
+      tags:
+      - Vinyl
+      description: ""
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/requestBodies/AddVinyl"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Vinyl"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/vinyls/search":
+    get:
+      tags:
+      - Vinyl
+      - Search
+      description: "
+          Parametre ___isInCollection___, ___isInWishlist___ et ___whichUser___ : \n\n
+            - Si ___isInCollection___ & ___isInWishlist___ sont renseignés, une erreur 400 est retournée.\n\n
+            - Si ___whichUser___ n'est pas renseigée et que ___isInCollection___ ou ___isInWishlist___ est renseigé, une erreur 400 est retournée.\n\n
+            - Si ___whichUser___ est renseigée et que ___isInCollection___ ou ___isInWishlist___ n'est pas renseigé, la liste de vinyl retournée est celle sans recherch dans _Collection_ et _Wishlist_.\n\n
+        " 
+      parameters: 
+      - name: by[vinylTitle]
+        example: thrill
+        in: query
+        schema:
+          type: string
+      - name: by[genreName]
+        example: rock
+        in: query
+        schema:
+          type: string
+      - name: by[styleName]
+        example: soul 
+        in: query
+        schema:
+          type: string
+      - name: isVariousArtist
+        example: false 
+        in: query
+        schema:
+          type: boolean
+      - name: by[artistName]
+        example: mcs
+        in: query
+        schema:
+          type: string
+      - name: by[labelName]
+        example: vir
+        in: query
+        schema:
+          type: string
+      - name: by[labelCatno]
+        example: QE 38112
+        in: query
+        schema:
+          type: string    
+      - name: isInCollection
+        example: true
+        in: query
+        schema:
+          type: boolean
+      - name: isInWishlist
+        example: false
+        in: query
+        schema:
+          type: boolean
+      - name: whichUser
+        example: 3
+        in: query
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Vinyls"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/vinyl/{id}":
+    get:
+      tags:
+      - Vinyl
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/idParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Vinyl"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+    patch:
+      tags:
+      - Vinyl
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/idParam"
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              allOf:
+              - $ref: "#/components/requestBodies/AddVinyl"
+              - type: object
+                properties:
+                  imagesPosition:
+                    type: array
+                    items: 
+                      type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Vinyl"
+        "304":
+          description: Not Modified
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/vinyl/{id}/formats":
+    get:
+      tags:
+      - Vinyl
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/idParam"
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/vinyl/{id}/tracklist":
+    # TODO: File requestBody
+    get:
+      tags:
+      - Vinyl
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/idParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VinylAudios"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+    post:
+      tags:
+      - Vinyl
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/idParam"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Audio"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/vinyl/{id}/likes":
+    get:
+      tags:
+      - Vinyl
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/idParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VinylLikes"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/vinyls/discovery":
+    get:
+      tags:
+      - Vinyl
+      description: ""
+      parameters:
+      - name: genre
+        in: query
+        schema:
+          type: string
+      - name: page
+        in: query
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Vinyls"
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/vinyl/{id}/images":
+    post: 
+      tags:
+      - Vinyl
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/idParam"
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties: 
+                newImages:
+                  type: string
+                  format: binary
+                position: 
+                  type: integer
+      responses:
+        "201":
+          description: Added
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+    delete:
+      tags:
+      - Vinyl
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/idParam"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                imageToSave:
+                  type: array
+                  items: 
+                    type: string
+                imageToDelete:
+                  type: array
+                  items: 
+                    type: string
+      responses:
+        "204":
+          description: Deleted
+        "304":
+          description: Not Modified
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+# Own Collection ✔︎
+  "/own/collection":
+    get:
+      tags:
+      - Own Collection
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OwnCollection"
+        "401":  
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []  
+  "/own/collection/vinyl/{idVinyl}":
+    get:
+      tags:
+      - Own Collection
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/idVinylParam"
+      responses:
+        "200":
+          description: Created
+
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+    post:
+      tags:
+      - Own Collection
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/idVinylParam"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                coverCondition: 
+                  type: string
+                diskCondition:
+                  type: string
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OwnCollection"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+    delete:
+      tags:
+      - Own Collection
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/idVinylParam"
+      responses:
+        "204":
+          description: No Content
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+# Own Transporters ✔︎
+  "/own/transporters":
+    get:
+      tags:
+      - Own Transporters
+      responses:
+        "200":
+          description: OK
+        "401":  
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []    
+  "/own/transporters/transporter/{transporterId}":
+    post:
+      tags:
+      - Own Transporters
+      description: ""
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/requestBodies/AddOwnTransporter"
+      parameters:
+      - $ref: "#/components/parameters/transporterIdParam"
+      responses:
+        "201":
+          description: Created
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+    patch:
+      tags:
+      - Own Transporters
+      description: ""
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/requestBodies/AddOwnTransporter"
+      parameters:
+      - $ref: "#/components/parameters/transporterIdParam"
+      responses:
+        "200":
+          description: Updated
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []  
+    delete:
+      tags:
+      - Own Transporters
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/transporterIdParam"
+      responses:
+        "204":
+          description: Deleted
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+# Own Follow ✔︎
+  "/own/followings":
+    get:
+      tags:
+      - Own Follow
+      description: ""
+      parameters:
+      - in: query
+        name: isArtist
+        schema:
+          type: boolean 
+      - in: query
+        name: counting
+        schema:
+          type: boolean
+      - $ref: "#/components/parameters/pageParam"
+      - $ref: "#/components/parameters/limitParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OwnFollowing"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/own/followers":
+    get:
+      tags:
+      - Own Follow
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/pageParam"
+      - $ref: "#/components/parameters/limitParam"
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/own/give/follow":
+    post:
+      tags:
+      - Own Follow
+      description: ""
+      parameters: 
+      - in: query
+        name: toFollow
+        required: true
+        schema:
+          type: integer
+      - in: query
+        name: isArtist
+        schema:
+          type: boolean    
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OwnFollowing"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/own/give/unfollow":
+    delete:
+      tags:
+      - Own Follow
+      description: ""
+      parameters: 
+      - in: query
+        name: userToUnfollow
+        required: true
+        schema:
+          type: integer
+      - in: query
+        name: isArtist
+        schema:
+          type: boolean    
+      responses:
+        "204":
+          description: No Content
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/own/delete/follower":
+    delete:
+      tags:
+      - Own Follow
+      description: ""
+      parameters: 
+      - in: query
+        name: userToDeleteFollower
+        required: true
+        schema:
+          type: integer
+      responses:
+        "204":
+          description: No Content
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+# Own Playlist ✔︎
+  "/own/playlists":
+    get:
+      tags:
+      - Own Playlist
+      description: ""
+      parameters: 
+      - $ref: "#/components/parameters/pageParam"
+      - $ref: "#/components/parameters/limitParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OwnPlaylists"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+    post:
+      tags:
+      - Own Playlist
+      description: ""
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/requestBodies/AddPlaylist"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OwnPlaylists"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/own/playlist/{id}":
+    get:
+      tags:
+      - Own Playlist
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/idParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OwnPlaylist"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+    patch:
+      tags:
+      - Own Playlist
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/idParam"
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/requestBodies/AddPlaylist"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OwnPlaylist"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+    delete:
+      tags:
+      - Own Playlist
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/idParam"
+      responses:
+        "204":
+          description: No Content
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/own/playlist/{id}/likes":
+    get:
+      tags:
+      - Own Playlist
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/idParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LikeOfOwnPlaylist"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/own/playlist/{idPlaylist}/audio/{idAudio}":
+    post:
+      tags:
+      - Own Playlist
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/idPlaylistParam"
+      - $ref: "#/components/parameters/idAudioParam"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OwnPlaylist"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+    delete:
+      tags:
+      - Own Playlist
+      description: ""
+      parameters:
+      - name: idPlaylist
+        in: path
+        required: true
+        type: string
+      - name: idAudio
+        in: path
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/own/playlist/{idPlaylist}/audio/{idAudio}/position":
+    patch:
+      tags:
+      - Own Playlist
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/idPlaylistParam"
+      - $ref: "#/components/parameters/idAudioParam"
+      - name: to
+        in: query
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OwnPlaylist"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+# Own Sell ✔︎
+  "/own/sells":
+    get:
+      tags:
+      - Own Sell
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/pageParam"
+      - $ref: "#/components/parameters/limitParam"
+      - name: isSelled
+        in: query
+        schema: 
+          type: boolean
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OwnSells"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+    post:
+      tags:
+      - Own Sell
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/idVinylQsParam"
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/requestBodies/AddSell"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OwnSell"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+# Own User ✔︎
+  "/own/user":
+    get:
+      tags:
+      - Own User
+      description: ""
+      parameters: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+    patch:
+      tags:
+      - Own User
+      description: ""
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/requestBodies/AddUser"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/own/user/store":
+    get:
+      tags:
+      - Own User
+      description: ""
+      parameters: []
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []  
+    post:
+      tags:
+      - Own User
+      description: ""
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/requestBodies/AddUserStore"
+      responses:
+        "201":
+          description: Created
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+    patch:
+      tags:
+      - Own User
+      description: ""
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/requestBodies/AddUserStore"
+      responses:
+        "201":
+          description: Created
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []  
+  "/own/user/deliveryaddress":
+    get:
+      tags:
+      - Own User
+      description: ""
+      parameters: []
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []  
+    post:
+      tags:
+      - Own User
+      description: ""
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/requestBodies/AddUserDeliveryAddress"
+      responses:
+        "201":
+          description: Created
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/own/user/deliveryaddress/{id}":
+    patch:
+      tags:
+      - Own User
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/idAddressParam"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/requestBodies/AddUserDeliveryAddress"
+      responses:
+        "200":
+          description: Updated
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []                                                
+  "/own/user/facturationaddress":
+    get:
+      tags:
+      - Own User
+      description: ""
+      parameters: []
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []  
+    post:
+      tags:
+      - Own User
+      description: ""
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/requestBodies/AddUserFacturationAddress"
+      responses:
+        "201":
+          description: Created
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/own/user/facturationaddress/{id}":
+    patch:
+      tags:
+      - Own User
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/idAddressParam"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/requestBodies/AddUserFacturationAddress"
+      responses:
+        "200":
+          description: Updated
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []   
+  "/own/user/policies":
+    get:
+      tags:
+      - Own User
+      description: ""
+      parameters: []
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: [] 
+    post:
+      tags:
+      - Own User
+      description: ""
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema: 
+              type: object
+              properties: 
+                policies:
+                  type: object
+      responses:
+        "201":
+          description: Created
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+    patch:
+      tags:
+      - Own User
+      description: ""
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema: 
+              type: object
+              properties: 
+                policies:
+                  type: object
+      responses:
+        "200":
+          description: Updated
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/own/user/photo":
+    post:
+      tags:
+      - Own User
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/typeImageParams"
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/requestBodies/AddProfilImage"
+      responses:
+        "201":
+          description: Created
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+    delete:
+      tags:
+      - Own User
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/typeImageParams"
+      responses:
+        "204":
+          description: Deleted
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/own/give/like":
+    post:
+      tags:
+      - Own User
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/idVinylQueryParam"
+      - $ref: "#/components/parameters/idPlaylistQueryParam"
+      - $ref: "#/components/parameters/idVideoParam"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: "#/components/schemas/PlaylistLikes"
+                - $ref: "#/components/schemas/VinylLikes"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/own/give/unlike":
+    delete:
+      tags:
+      - Own User
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/idVinylQueryParam"
+      - $ref: "#/components/parameters/idPlaylistQueryParam"
+      - $ref: "#/components/parameters/idVideoParam"
+      responses:
+        "204":
+          description: No Content
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/own/isLiked":
+    get:
+      tags:
+      - Own User
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/idVinylQueryParam"
+      - $ref: "#/components/parameters/idPlaylistQueryParam"
+      - $ref: "#/components/parameters/idVideoParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              example: true
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/own/preferences":
+    get:
+      tags:
+      - Own User
+      description: ""
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+    patch:
+      tags:
+      - Own User
+      description: "Le JSON passer à la requete de l'API doit contenir des clé contenant des tableau d'__id__"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                preferences:
+                  type: object
+                  example: "{Genres:[1,5,11]}"
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+# Own Wishlist ✔︎
+  "/own/wishlist":
+    get:
+      tags:
+      - Own Wishlist
+      description: ""
+      parameters: 
+      - $ref: "#/components/parameters/pageParam"
+      - $ref: "#/components/parameters/limitParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OwnWishlist"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  "/own/wishlist/vinyl/{idVinyl}":
+    get:
+      tags:
+      - Own Wishlist
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/idVinylParam"
+      responses:
+        "200":
+          description: Getted
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+    post:
+      tags:
+      - Own Wishlist
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/idVinylParam"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                coverCondition: 
+                  type: string
+                diskCondition:
+                  type: string
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OwnWishlist"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []  
+    delete:
+      tags:
+      - Own Wishlist
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/idVinylParam"
+      responses:
+        "204":
+          description: No Content
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+  # Query Params
+    idVinylQsParam:
+      name: vinylId
+      in: query
+      required: true
+      schema:
+        type: integer        
+    pageParam:
+      name: page
+      in: query
+      schema:
+        type: integer
+    limitParam:
+      name: limit
+      in: query
+      schema:
+        type: integer
+    searchField:  
+      name: withCol[field]
+      description: Permet de rechercher sur une colomne en particulier avec le __nom de colomne__( ___field___ ) souhaité
+      example: name
+      in: query
+      required: true
+      schema:
+        type: array
+        items:
+          type: string
+    searchValue:  
+      name: withCol[value]
+      description: Permet de rechercher sur une colomne en particulier avec la __valeur__( ___value___ ) souhaitée
+      example: michael
+      in: query
+      required: true
+      schema:
+        type: array
+        items:
+          type: string
+    imageFromParams:
+      name: imageFrom
+      description: "Correspond à l'entiter dans laquelle on veut récupérer l'image. (exemple: ___user___, si on veux l'image d'un utilisateur)"
+      in: query
+      required: true
+      schema:
+        type: string
+    typeImageParams:
+      name: typeImage
+      description: "Correspond au type de l'image. (valeurs possible: ___large___ / ___thumbnail___ | Pour: __imageFrom__ = \"user\" => ___profilImage___ / ___coverImage___)."
+      in: query
+      required: true
+      schema:
+        type: string
+    typeAudioParams:
+      name: typeAudio
+      description: "Correspond au type de l'audio. (valeurs possible: ___song___)."
+      in: query
+      required: true
+      schema:
+        type: string
+    idVinylQueryParam:
+      name: vinylId
+      in: query
+      # required: true
+      schema:
+        type: integer
+    idPlaylistQueryParam:
+      name: playlistId
+      in: query
+      # required: true
+      schema:
+        type: integer
+    idVideoParam:
+      name: videoId
+      in: query
+      # required: true
+      schema:
+        type: integer
+    
+  # Path Params
+    idParam:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+    userParam:
+      name: username
+      in: path
+      required: true
+      schema:
+        type: string
+    idAddressParam:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+    idUserParam:
+      name: idUser
+      in: path
+      required: true
+      schema:
+        type: integer
+    idVinylParam:
+      name: idVinyl
+      in: path
+      # required: true
+      schema:
+        type: integer
+    transporterIdParam:
+      name: transporterId
+      in: path
+      # required: true
+      schema:
+        type: integer    
+    idPlaylistParam:
+      name: idPlaylist
+      in: path
+      # required: true
+      schema:
+        type: integer
+    idAudioParam:
+      name: idAudio
+      in: path
+      required: true
+      schema:
+        type: integer
+    imageFrom:
+      name: imageFrom
+      description: "Correspond à l'entiter dans laquelle on veut récupérer l'image. (exemple: ___artists___, si on veux l'image d'un artiste)"
+      in: path
+      required: true
+      schema:
+        type: string
+    typeImage:
+      name: typeImage
+      description: "Correspond au type de l'image. (valeurs possible: ___larges___ / ___thumbnails___ | Pour: __imageFrom__ = \"user\" => ___profilImage___ / ___coverImage___)."
+      in: path
+      required: true
+      schema:
+        type: string
+    keyFile:
+      name: key
+      description: "Correspond au nom de l'image."
+      in: path
+      required: true
+      schema:
+        type: string
+  requestBodies:
+    AddUserStore:
+      type: object
+      properties:
+        isPro :
+          type: boolean
+        siret:
+          type: string
+        tva:
+          type: string
+        societyName:
+          type: string    
+        firstName:
+          type: string
+        lastName:
+          type: string
+        address:
+          type: string    
+        postalCode:
+          type: string
+        town:
+          type: string
+        state:
+          type: string
+        country:
+          type: string
+        phoneNumber:
+          type: string 
+    AddUserDeliveryAddress:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        address:
+          type: string    
+        postalCode:
+          type: string
+        town:
+          type: string
+        state:
+          type: string
+        country:
+          type: string
+        phoneNumber:
+          type: string
+    AddUserFacturationAddress:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        address:
+          type: string    
+        postalCode:
+          type: string
+        town:
+          type: string
+        state:
+          type: string
+        country:
+          type: string                               
+    Login:
+      type: object
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+        phoneNumber:
+          type: string
+        # password:
+        #   type: string
+        # token: 
+        #   type: string
+    RegistrationRequest:
+      type: object
+      properties:
+        email:
+          type: string
+        phoneNumber:
+          type: string
+    RegistrationVerif:
+      type: object
+      properties:
+        email:
+          type: string
+        smsId:
+          type: string
+        code:
+          type: string
+      required:
+      - code
+    AddUser:
+      allOf:
+      - type: object
+        properties:
+          username:
+            type: string
+          email:
+            type: string
+          phoneNumber:
+            type: string
+          firstName:
+            type: string
+          lastName:
+            type: string
+          showName:
+            type: string
+          birthDate:
+            type: string
+          note:
+            type: integer
+          localisation:
+            type: string
+          description:
+            type: string
+          password:
+            type: string
+        required:
+        - username
+        - password
+      - type: object
+        properties: 
+          profilImage:
+            type: string
+            format: binary
+          coverImage:
+            type: string
+            format: binary
+    AddMaster:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: text
+        releaseDate:
+          type: string
+        images:
+          type: array
+          items:
+            type: string
+            format: binary
+        thumbnail:
+          type: string
+          format: binary
+        # tracklist:
+        #   type: object
+      # required:
+      # - title
+      # - releaseDate
+    AddVideo:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: text
+    AddVinyl:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: text
+        country:
+          type: string
+        releaseDate:
+          type: string
+        images:
+          type: array
+          items:
+            type: string
+            format: binary
+        thumbnail:
+          type: string
+          format: binary
+        identifiers:
+          type: array
+    AddArtist:
+      type: object
+      properties:
+        name:
+          type: string
+        fullName:
+          type: string
+        aliasNames:
+          type: array
+        variantNames:
+          type: array
+        description:
+          type: text
+        inGroups:
+          type: array
+        images:
+          type: array
+          items: 
+            type: string
+            format: binary
+        thumbnail:
+          type: string
+          format: binary
+      # required:
+      # - name
+    AddAudio:
+      type: object
+      properties:
+        title: 
+          type: string
+        description: 
+          type: text
+        image: 
+          type: string
+          format: binary
+        duration: 
+          type: integer
+        position: 
+          type: string
+        type: 
+          type: string
+        # credits: 
+        #   type: object
+        songFile: 
+          type: string
+          format: binary
+    AddFormat:
+      type: object
+      properties:
+        name: 
+          type: string
+        description: 
+          type: text
+    AddGenre:
+      type: object
+      properties:
+        name: 
+          type: string 
+    AddLabel:
+      type: object
+      properties:
+        name: 
+          type: string      
+    AddPlaylist:
+      type: object
+      properties:
+        title: 
+          type: string
+        description: 
+          type: text
+        image: 
+          type: string
+          format: binary
+    AddTransporter:
+      type: object
+      properties:
+        name: 
+          type: string
+        deliveryDelay: 
+          type: json
+        image: 
+          type: string
+          format: binary      
+    AddOwnTransporter:
+      type: object
+      properties:
+        freeCondition: 
+          type: float
+        continents: 
+          type: json  
+    AddSell:
+      type: object
+      properties:
+        title: 
+          type: string
+        description: 
+          type: text
+        price: 
+          type: float
+        devise: 
+          type: string
+        quantity: 
+          type: integer
+        coverCondition: 
+          type: string
+        diskCondition: 
+          type: string
+        itemWeight:
+          type: float
+        additionalImages:
+          type: array
+          items:
+            type: string
+            format: binary    
+    AddStore:
+      type: object
+      properties:
+        name: 
+          type: string
+        description: 
+          type: text
+        hours: 
+          type: object
+        contacts: 
+          type: object
+        address: 
+          type: object
+        lat: 
+          type: float
+        lng: 
+          type: float
+        images: 
+          type: object
+        genres: 
+          type: object
+        styles: 
+          type: object
+        formats: 
+          type: object
+        mainSells: 
+          type: object
+        otherSells: 
+          type: object
+    AddProfilImage: 
+      type: object
+      properties:
+        profilImage:
+          type: string
+          format: base64
+    AddSongFile: 
+      type: object
+      properties:
+        songFile:
+          type: string
+          format: base64
+    AddFile: 
+      type: object
+      properties:
+        image:
+          type: string
+          format: base64
+    AddFiles: 
+      type: object
+      properties:
+        file:
+          type: array
+          items:
+            type: string
+            format: base64
+  schemas:
+  # Minimal of
+    MinOfArtist:
+      type: object
+      properties:
+        id: 
+          type: integer
+        idArtist: 
+          type: integer
+        name:
+          type: string
+        thumbnail:
+          type: string
+        artistUrl:
+          type: string
+        ressourceUrl:
+          type: string
+    MinOfAudio:
+      type: object
+      properties:
+        id: 
+          type: integer
+        title: 
+          type: string
+        image: 
+          type: string
+        duration: 
+          type: integer
+        audioUrl: 
+          type: string
+        resourceUrl: 
+          type: string
+    MinOfFormat:
+      type: object
+      properties:
+        id: 
+          type: integer
+        name: 
+          type: string
+    MinOfGenre:
+      type: object
+      properties:
+        id: 
+          type: integer
+        name: 
+          type: string
+    MinOfLabel:
+      type: object
+      properties:
+        id: 
+          type: integer
+        idLabel:
+          type: integer 
+        name: 
+          type: string
+    MinOfMaster:
+      type: object
+      properties:
+        id: 
+          type: integer
+        idMaster:
+          type: integer  
+        title:
+          type: string
+        releaseDate:
+          type: string    
+        thumbnail:
+          type: string
+        masterUrl:
+          type: string
+        resourceUrl:
+          type: string
+    MinOfPlaylist:
+      type: object
+      properties:
+        id: 
+          type: integer
+        title: 
+          type: string
+        duration: 
+          type: integer
+        image: 
+          type: string
+        playlistUrl: 
+          type: string
+        resourceUrl: 
+          type: string
+    MinOfPlaylistWithOwn:
+        allOf:
+        - $ref: "#/components/schemas/MinOfPlaylist"
+        - type: object  
+          properties:
+            id: 
+              type: integer
+            Owner:
+              $ref: "#/components/schemas/MinOfUser"
+    MinOfSell:
+      type: object
+      properties:
+        title: 
+          type: string
+        price: 
+          type: integer
+        devise: 
+          type: string
+        quantity: 
+          type: string
+        condition: 
+          type: string
+        User:
+          $ref: "#/components/schemas/MinOfUser"
+        Vinyl:
+          $ref: "#/components/schemas/MinOfVinyl"
+    MinOfSellForOwn:
+      type: object
+      properties:
+        title: 
+          type: string
+        price: 
+          type: integer
+        devise: 
+          type: string
+        quantity: 
+          type: string
+        condition: 
+          type: string
+        Vinyl:
+          $ref: "#/components/schemas/MinOfVinyl"
+    MinOfStore:
+      type: object
+      properties:
+        id: 
+          type: integer
+        name: 
+          type: string
+        address: 
+          type: object
+        lat: 
+          type: float
+        lng: 
+          type: float
+        images: 
+          type: object
+        genres: 
+          type: object
+        styles: 
+          type: object
+    MinOfStyle:
+      type: object
+      properties:
+        id: 
+          type: integer
+        name: 
+          type: string
+    MinOfUserForEntity:
+      type: object
+      properties:
+        id: 
+          type: integer
+        username:
+          type: string
+    MinOfUser:
+      type: object
+      properties:
+        id: 
+          type: integer
+        username:
+          type: string
+        email:
+            type: string
+        phoneNumber:
+            type: string
+        showName:
+          type: string
+        # firstName:
+        #   type: string
+        # lastName:
+        #   type: string
+        profilImage:
+          type: string
+        role:
+          type: string  
+    MinOfVideo:
+      type: object
+      properties:
+        id: 
+          type: integer
+        title:
+          type: string  
+        description:
+          type: text 
+        videoUrl:
+          type: string  
+    MinOfVinyl:
+      type: object
+      properties:
+        id: 
+          type: integer
+        idRelease: 
+          type: integer  
+        title:
+          type: string  
+        thumbnail:
+          type: string  
+        vinylUrl:
+          type: string
+        resourceUrl:
+          type: string
+  
+  # Array of
+    ArrayOfArtist:
+      type: array
+      items: 
+        $ref: "#/components/schemas/MinOfArtist"
+    ArrayOfAudio:
+      type: array
+      items: 
+        $ref: "#/components/schemas/MinOfAudio"
+    ArrayOfFormat:
+      type: array
+      items: 
+        $ref: "#/components/schemas/MinOfFormat"
+    ArrayOfGenre:
+      type: array
+      items: 
+        $ref: "#/components/schemas/MinOfGenre"
+    ArrayOfLabel:
+      type: array
+      items: 
+        $ref: "#/components/schemas/MinOfLabel"
+    ArrayOfMaster:
+      type: array
+      items: 
+        $ref: "#/components/schemas/MinOfMaster"
+    ArrayOfPlaylist:
+      type: array
+      items: 
+        $ref: "#/components/schemas/MinOfPlaylist"
+    ArrayOfPlaylistWithOwn:
+      type: array
+      items: 
+        $ref: "#/components/schemas/MinOfPlaylistWithOwn"
+    ArrayOfSell:
+      type: array
+      items: 
+        $ref: "#/components/schemas/MinOfSell"
+    ArrayOfStore:
+      type: array
+      items: 
+        $ref: "#/components/schemas/MinOfStore"
+    ArrayOfStyle:
+      type: array
+      items: 
+        $ref: "#/components/schemas/MinOfStyle"
+    ArrayOfUser:
+      type: array
+      items: 
+        $ref: "#/components/schemas/MinOfUser"
+    ArrayOfVinyl:
+      type: array
+      items: 
+        $ref: "#/components/schemas/MinOfVinyl"
+    ArrayOfVinylLabel:
+      type: array
+      items: 
+        allOf:
+        - $ref: "#/components/schemas/MinOfVinyl"
+        - $ref: "#/components/schemas/LabelsInVinyl"
+    
+  # Item of
+    Artist:
+      type: object
+      properties: 
+        artist:
+          allOf:
+          - $ref: "#/components/schemas/MinOfArtist"
+          - type: object
+            properties:
+              fullName:
+                type: string
+              aliasNames:
+                type: array
+                items:
+                  type: string
+              variantNames:
+                type: array
+                items:
+                  type: string
+              description:
+                type: text
+              inGroups:
+                type: array
+                items:
+                  type: string
+              images:
+                type: array
+                items:
+                  type: string
+              VinylMainArtists: 
+                allOf:
+                - $ref: "#/components/schemas/ArrayOfVinyl"
+              VinylCredits:
+                allOf:
+                - $ref: "#/components/schemas/ArrayOfVinyl"
+              MasterMainArtists: 
+                allOf:
+                - $ref: "#/components/schemas/ArrayOfMaster"
+              MasterCredits:
+                allOf:
+                - $ref: "#/components/schemas/ArrayOfMaster"
+              Audio: 
+                allOf:
+                - $ref: "#/components/schemas/ArrayOfAudio"
+    Audio:
+      type: object
+      properties: 
+        audio:
+          allOf:
+          - $ref: "#/components/schemas/MinOfAudio"
+          - type: object
+            properties:
+              description: 
+                type: text
+              position: 
+                type: string
+              type: 
+                type: string
+              credits: 
+                type: object
+                properties: 
+                  creditRole:
+                    type: string
+                  creditType:
+                    type: string
+                  creditArtistId:
+                    type: integer
+                  creditArtistName:
+                    type: string
+              Vinyl: 
+                $ref: "#/components/schemas/MinOfVinyl"
+              Artist: 
+                $ref: "#/components/schemas/MinOfArtist"
+              PlayList: 
+                $ref: "#/components/schemas/ArrayOfPlaylist"
+    Collection: 
+      type: object
+      properties: 
+        Vinyls:
+          allOf:
+          - $ref: "#/components/schemas/ArrayOfVinyl"
+          - type: array
+            items:
+              type: object
+              properties: 
+                VinylsInCollection:
+                  type: object
+                  properties:
+                    coverCondition:
+                      type: string
+                    diskCondition:
+                      type: string  
+    Format:
+      type: object
+      properties: 
+        format:
+          allOf:
+          - $ref: "#/components/schemas/MinOfFormat"
+          - type: object
+          properties:
+            description: 
+              type: text
+            Vinyl: 
+              $ref: "#/components/schemas/MinOfVinyl"
+    Genre:
+      type: object
+      properties: 
+        genre:
+          allOf:
+          - $ref: "#/components/schemas/MinOfGenre"
+          - type: object
+            properties:
+              Masters:
+                $ref: "#/components/schemas/ArrayOfMaster"
+              Vinyls:
+                $ref: "#/components/schemas/ArrayOfVinyl"
+    StyleInGenre:
+      type: object
+      properties: 
+        genre:
+          allOf:
+          - $ref: "#/components/schemas/MinOfGenre"
+          - type: object
+            properties:
+              Styles:
+                $ref: "#/components/schemas/ArrayOfStyle"
+    Label:
+      type: object
+      properties: 
+        label:
+          allOf:
+          - $ref: "#/components/schemas/MinOfLabel"
+          - type: object
+          properties:
+            VinylLabels:
+              $ref: "#/components/schemas/ArrayOfVinylLabel"
+            VinylSocietes:
+              $ref: "#/components/schemas/ArrayOfVinyl"
+    LabelsInVinyl:
+      type: object
+      properties:
+        LabelsInVinyl:
+          type: object
+          properties:
+            catno:
+              type: string
+    Master:
+      type: object
+      properties: 
+        master:
+          allOf:
+          - $ref: "#/components/schemas/MinOfMaster"
+          - type: object
+          properties:
+            description:
+              type: text
+            releaseDate:
+              type: string
+            masterUrl:
+              type: string
+            resourceUrl:
+              type: string
+            images:
+              type: array
+              items:
+                type: string
+            tracklist:
+              type: array
+              items:
+                type: object
+                properties:
+                  name: 
+                    type: string
+                  duration:
+                    type: integer
+            Vinyls:
+              $ref: "#/components/schemas/ArrayOfVinyl"
+            MasterMainArtists:
+              $ref: "#/components/schemas/ArrayOfArtist"
+            MasterCredits:
+              $ref: "#/components/schemas/ArrayOfArtist"
+            Genre:
+              $ref: "#/components/schemas/ArrayOfGenre"
+            Style:
+              $ref: "#/components/schemas/ArrayOfStyle"
+    Playlist:
+      type: object
+      properties: 
+        playlist:
+          allOf:
+          - $ref: "#/components/schemas/MinOfPlaylist"
+          - type: object
+          properties:
+            description: 
+              type: text
+            duration: 
+              type: integer
+            nbAudios:
+              type: integer
+            nbLikes:
+              type: integer
+            Audio:
+              allOf:
+              - $ref: "#/components/schemas/ArrayOfAudio"
+              - type: array
+                items: 
+                  type: object
+                  properties:
+                    AudiosInPlaylist:
+                      type: object
+                      properties: 
+                        position:
+                          type: integer
+            Like:
+              $ref: "#/components/schemas/ArrayOfUser"
+    PlaylistWithOwn:
+      type: object
+      properties: 
+        playlist:
+          allOf:
+          - $ref: "#/components/schemas/MinOfPlaylistWithOwn"
+          - type: object
+          properties:
+            description: 
+              type: text
+            duration: 
+              type: integer
+            Audio:
+              allOf:
+              - $ref: "#/components/schemas/ArrayOfAudio"
+              - type: array
+                items:
+                  type: object
+                  properties:
+                    AudiosInPlaylist:
+                      type: object
+                      properties:
+                        position:
+                          type: integer
+            Like:
+              $ref: "#/components/schemas/ArrayOfUser"
+    Sell:
+      type: object
+      properties: 
+        sell:
+          allOf:
+          - $ref: "#/components/schemas/MinOfSell"
+          - type: object
+          properties:
+            description: 
+              type: text
+    SellForOwn:
+      type: object
+      properties: 
+        sell:
+          allOf:
+          - $ref: "#/components/schemas/MinOfSellForOwn"
+          - type: object
+          properties:
+            description: 
+              type: text
+    Store:
+      type: object
+      properties: 
+        store:
+          allOf:
+          - $ref: "#/components/schemas/MinOfStore"
+          - type: object
+          properties:
+            description: 
+              type: text
+            hours: 
+              type: object
+            contacts: 
+              type: object
+            formats: 
+              type: object
+            mainSells: 
+              type: object
+            otherSells: 
+              type: object
+    Style:
+      type: object
+      properties: 
+        style:
+          allOf:
+          - $ref: "#/components/schemas/MinOfStyle"
+          - type: object
+            properties:
+              Genre:
+                $ref: "#/components/schemas/MinOfGenre"
+              Vinyls:
+                $ref: "#/components/schemas/ArrayOfVinyl"
+              Masters:
+                $ref: "#/components/schemas/ArrayOfMaster"
+    User:
+      type: object
+      properties: 
+        user:
+          allOf:
+          - $ref: "#/components/schemas/MinOfUser"
+          - type: object
+          properties:
+            # email:
+            #   type: string
+            # phoneNumber:
+            #   type: string
+            firstName:
+              type: string
+            lastName:
+              type: string
+            birthDate:
+              type: string
+            note:
+              type: string
+            localisation:
+              type: string
+            description:
+              type: string
+            coverImage:
+              type: string
+            createdAt:
+              type: string
+            updatedAt:
+              type: string
+            followings:
+              type: integer
+            followers:
+              type: integer
+    UsernameOfUser:
+      type: object
+      properties:
+        username:
+          type: string
+    PlaylistOfUser:
+      type: object
+      properties: 
+        user:
+          allOf:
+          - $ref: "#/components/schemas/MinOfUserForEntity"
+          - type: object
+            properties:
+              PlayList: 
+                $ref: "#/components/schemas/ArrayOfPlaylist"
+    SellOfUser:
+      type: object
+      properties: 
+        user:
+          allOf:
+          - $ref: "#/components/schemas/MinOfUserForEntity"
+          - type: object
+            properties:
+              Sell: 
+                $ref: "#/components/schemas/ArrayOfSell"
+    FollowingsOfUser:
+      type: object
+      properties: 
+        user:
+          allOf:
+          - $ref: "#/components/schemas/MinOfUserForEntity"
+          - type: object
+            properties:
+              followings:
+                type: integer
+              Followings: 
+                $ref: "#/components/schemas/ArrayOfUser"
+    FollowersOfUser:
+      type: object
+      properties: 
+        user:
+          allOf:
+          - $ref: "#/components/schemas/MinOfUserForEntity"
+          - type: object
+            properties:
+              followers:
+                type: integer
+              Followers: 
+                $ref: "#/components/schemas/ArrayOfUser"
+    CollectionOfUser:
+      type: object
+      properties: 
+        user:
+          allOf:
+          - $ref: "#/components/schemas/MinOfUserForEntity"
+          - type: object
+            properties:
+              id:
+                type: integer
+              Collection:
+                $ref: "#/components/schemas/Collection"
+    WishlistOfUser:
+      type: object
+      properties: 
+        user:
+          allOf:
+          - $ref: "#/components/schemas/MinOfUserForEntity"
+          - type: object
+            properties:
+              id:
+                type: integer
+              Wishlist:
+                $ref: "#/components/schemas/Wishlist"
+    Vinyl:
+      type: object
+      properties: 
+        vinyl:
+          allOf:
+          - $ref: "#/components/schemas/MinOfVinyl"
+          - type: object
+          properties:
+            description:
+              type: text
+            country:
+              type: string
+            releaseDate:
+              type: string
+            vinylUrl:
+              type: string
+            resourceUrl:
+              type: string
+            images:
+              type: array
+              items:
+                type: string
+            tracks:
+              type: string
+            identifiers:
+              type: array
+              items:
+                type: object
+                properties:
+                  type:
+                    type: string
+                  value:
+                    type: string
+                  description:
+                    type: string
+            Masters:
+              $ref: "#/components/schemas/MinOfMaster"
+            Audio:
+              $ref: "#/components/schemas/ArrayOfAudio"
+            VinylMainArtists:
+              $ref: "#/components/schemas/ArrayOfArtist"
+            VinylCredits:
+              $ref: "#/components/schemas/ArrayOfArtist"
+            VinylLabels:
+              $ref: "#/components/schemas/ArrayOfLabel"
+            VinylSocietes:
+              $ref: "#/components/schemas/ArrayOfLabel"
+            Format:
+              $ref: "#/components/schemas/ArrayOfFormat"
+            Genre:
+              $ref: "#/components/schemas/ArrayOfGenre"
+            Style:
+              $ref: "#/components/schemas/ArrayOfStyle"
+            Sells:
+              $ref: "#/components/schemas/ArrayOfUser"
+            VinylLike:
+              $ref: "#/components/schemas/ArrayOfUser"
+    Wishlist: 
+      type: object
+      properties: 
+        Vinyls:
+          allOf:
+          - $ref: "#/components/schemas/ArrayOfVinyl"
+          - type: array
+            items:
+              type: object
+              properties: 
+                VinylsInWishlist:
+                  type: object
+                  properties:
+                    coverCondition:
+                      type: string
+                    diskCondition:
+                      type: string  
+    # Own
+    OwnCollection:
+      type: object
+      properties:
+        user:
+          $ref: "#/components/schemas/MinOfUser"
+        collection:
+          $ref: "#/components/schemas/Collection"
+    OwnFollowing:
+      type: object
+      properties:
+        user:
+          $ref: "#/components/schemas/MinOfUser"
+        followings:
+          $ref: "#/components/schemas/ArrayOfUser"
+    OwnFollower:
+      type: object
+      properties:
+        user:
+          $ref: "#/components/schemas/MinOfUser"
+        followers:
+          $ref: "#/components/schemas/ArrayOfUser"
+    OwnPlaylists:
+      type: object
+      properties:
+        user:
+          $ref: "#/components/schemas/MinOfUser"
+        playlist:
+          allOf:
+          - $ref: "#/components/schemas/ArrayOfPlaylist"
+          - type: array
+            items:
+              type: object
+              properties:
+                nbAudios:
+                  type: integer
+                nbLikes:
+                  type: integer
+    OwnPlaylist:
+      allOf: 
+      - type: object
+        properties:
+          user:
+            $ref: "#/components/schemas/MinOfUser"
+      - $ref: "#/components/schemas/Playlist"
+    LikeOfOwnPlaylist:
+      allOf: 
+      - type: object
+        properties:
+          user:
+            $ref: "#/components/schemas/MinOfUser"
+      - $ref: "#/components/schemas/PlaylistLikes"
+    OwnSells:
+      type: object
+      properties:
+        user:
+          $ref: "#/components/schemas/MinOfUser"
+        sells:
+          $ref: "#/components/schemas/ArrayOfSell"
+    OwnSell:
+      allOf: 
+      - type: object
+        properties:
+          user:
+            $ref: "#/components/schemas/MinOfUser"
+      - $ref: "#/components/schemas/SellForOwn"
+    OwnWishlist:
+      type: object
+      properties:
+        user:
+          $ref: "#/components/schemas/MinOfUser"
+        wishlist:
+          $ref: "#/components/schemas/Wishlist"
+    OwnUserPreferences:
+      type: object
+      properties:
+        user:
+          allOf:
+          - $ref: "#/components/schemas/MinOfUser"
+          - type: object
+            properties:
+              type: object
+  
+  # List of
+    Artists:
+      type: object
+      properties:
+        artists:
+          allOf:
+          - $ref: "#/components/schemas/ArrayOfArtist"
+    Audios:
+      type: object
+      properties:
+        audios:
+          allOf:
+          - $ref: "#/components/schemas/ArrayOfAudio"
+    Formats:
+      type: object
+      properties:
+        formats:
+          allOf:
+          - $ref: "#/components/schemas/ArrayOfFormat"
+    Genres:
+      type: object
+      properties:
+        genres:
+          allOf:
+          - $ref: "#/components/schemas/ArrayOfGenre"
+    Labels:
+      type: object
+      properties:
+        labels:
+          allOf:
+          - $ref: "#/components/schemas/ArrayOfLabel"
+    Masters:
+      type: object
+      properties:
+        masters:
+          allOf:
+          - $ref: "#/components/schemas/ArrayOfMaster"
+    Playlists:
+      type: object
+      properties:
+        playlists:
+          allOf:
+          - $ref: "#/components/schemas/ArrayOfPlaylist"
+    PlaylistsWithOwn:
+      type: object
+      properties:
+        playlists:
+          allOf:
+          - $ref: "#/components/schemas/ArrayOfPlaylistWithOwn"
+    PlaylistLikes:
+      type: object
+      properties:
+        playlists:
+          allOf:
+          - $ref: "#/components/schemas/MinOfPlaylist"
+          - type: object
+            properties:
+              nbLikes:
+                type: integer
+              Likes: 
+                allOf:
+                - $ref: "#/components/schemas/ArrayOfUser"
+    PlaylistWithOwnLikes:
+      type: object
+      properties:
+        playlists:
+          allOf:
+          - $ref: "#/components/schemas/MinOfPlaylistWithOwn"
+          - type: object
+            properties:
+              Likes: 
+                allOf:
+                - $ref: "#/components/schemas/ArrayOfUser"
+    Sells:
+      type: object
+      properties:
+        sells:
+          allOf:
+          - $ref: "#/components/schemas/ArrayOfSell"
+    Stores:
+      type: object
+      properties:
+        stores:
+          allOf:
+          - $ref: "#/components/schemas/ArrayOfStore"
+    Styles:
+      type: object
+      properties:
+        styles:
+          allOf:
+          - $ref: "#/components/schemas/ArrayOfStyle"
+    Users:
+      type: object
+      properties:
+        users:
+          allOf:
+          - $ref: "#/components/schemas/ArrayOfUser"
+    Vinyls:
+      type: object
+      properties:
+        vinyls:
+          allOf:
+          - $ref: "#/components/schemas/ArrayOfVinyl"
+    VinylsByMaster:
+      type: object
+      properties:
+        master:
+          type: object
+          properties:
+            id: 
+              type: integer
+            title:
+              type: string
+            Vinyls:
+              allOf:
+              - $ref: "#/components/schemas/ArrayOfVinyl"
+    VinylAudios:
+      type: object
+      properties: 
+        audios: 
+          $ref: "#/components/schemas/ArrayOfAudio"
+    VinylSells:
+      type: object
+      properties:
+        vinyl:
+          allOf:
+          - $ref: "#/components/schemas/MinOfVinyl"
+          - type: object
+            properties:
+              Sells: 
+                allOf: 
+                - $ref: "#/components/schemas/ArrayOfSell"
+    VinylLikes:
+      type: object
+      properties:
+        vinyl:
+          type: object
+          properties:
+            id:
+              type: integer
+            VinylLike: 
+              $ref: "#/components/schemas/MinOfUserForEntity"

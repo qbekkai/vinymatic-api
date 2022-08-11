@@ -1,0 +1,20 @@
+module.exports = {
+  Vinyls: ["id", "idRelease", "title", "country", "releaseDate", "thumbnail", "vinylUrl", "createdAt", "updatedAt"],
+  Vinyl: ["id", "idRelease", "title", "description", "country", "releaseDate", "thumbnail", "images", "vinylUrl", "identifiers"],
+  Masters: ["id", "idMaster", "title", "releaseDate", "thumbnail", "masterUrl", "createdAt", "updatedAt",],
+  Master: ["id", "idMaster", "title", "description", "releaseDate", "thumbnail", "images", "masterUrl", "tracklist"],
+  Audio: ["id", "title", "position", "duration", "type", "credits", "audioUrl"],
+  Artists: ["id", "idArtist", "name", "thumbnail", "artistUrl", "resourceUrl",],
+  Artist: ["id", "idArtist", "name", "fullName", "aliasNames", "variantNames", "description", "inGroups", "thumbnail", "images", "artistUrl"],
+  Labels: ["id", "idLabel", "name"],
+  Label: ["id", "idLabel", "name"],
+  Formats: ["id", "name"],
+  Format: ["id", "name", "description"],
+  Genre: ["id", "name"],
+  Style: ["id", "name"],
+  Stores: ["id", "placeId", "name", "descript", "images", "formattedAddress", "geometry", "rating", "hours", "contacts", "types"],
+  Store: ["id", "placeId", "name", "descript", "images", "formattedAddress", "geometry", "rating", "userRatingsTotal", "hours", "contacts", "types", "genres", "formats", "styles", "mainSells", "otherSells"],
+  Users: ["id", "username", "showName", "email", "phoneNumber", "profilImage", "role"],
+  User: ["id", "username", "email", "phoneNumber", "profilImage", "role", "firstName", "lastName", "birthDate"],
+}
+

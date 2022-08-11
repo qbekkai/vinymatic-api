@@ -1,0 +1,60 @@
+{
+  "development": {
+    "username": "root",
+    "password": "root",
+    "database": "vinymatic_dev_new",
+    "host": "localhost",
+    "port": "3306",
+    "dialect": "mysql",
+    "define": {
+      "charset": "utf8mb4",
+      "collate": "utf8mb4_unicode_ci"
+    },
+    "logging": false
+  },
+  "devPg": {
+    "username": "postgres",
+    "password": "root",
+    "database": "vinymatic_dev",
+    "host": "localhost",
+    "port": "5432",
+    "dialect": "postgres",
+    "logging": false
+  },
+  "test": {
+    "username": "root",
+    "password": "root",
+    "database": "vinymatic_test",
+    "host": "localhost",
+    "dialect": "mysql",
+    "define": {
+      "charset": "utf8mb4",
+      "collate": "utf8mb4_unicode_ci"
+    },
+    "logging": false
+  },
+  "preProd": {
+    "username": "root",
+    "password": "root",
+    "database": "vinymatic_prod",
+    "host": "localhost",
+    "dialect": "mysql",
+    "define": {
+      "charset": "utf8mb4",
+      "collate": "utf8mb4_unicode_ci"
+    },
+    "logging": false
+  },
+  "production": {
+    "username": "dbmasteruser",
+    "password": ":2fFPx+K=;gzto;X95qt:-!vC)`M!cgy",
+    "database": "vinymatic",
+    "host": "ls-2fada422f5462f386f444a8182a7735d4d19da73.cjdzgdt6dipw.eu-west-3.rds.amazonaws.com",
+    "dialect": "mysql",
+    "define": {
+      "charset": "utf8mb4",
+      "collate": "utf8mb4_unicode_ci"
+    },
+    "logging": false
+  }
+}
