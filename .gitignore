@@ -1,3 +1,7 @@
+.env*
+uploads
+download
+
 # Logs
 logs
 *.log
@@ -102,3 +106,7 @@ dist
 
 # TernJS port file
 .tern-port
+src/error/errorFromSraping.csv
+src/tools/store copy.sql
+src/tools/store.sql
+package-lock.json
