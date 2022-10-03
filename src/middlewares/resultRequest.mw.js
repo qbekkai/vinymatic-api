@@ -8,7 +8,18 @@ module.exports = async (req, res, next) => {
   /** DATA MANIPULATION */
   if (results) {
     let dataValues = null
-    if (results.tracklist) {
+    if (results.artistFollowers) {
+      const Followers = []
+      results.artistFollowers.forEach(f => {
+        Followers.push({
+          id: f.dataValues.id,
+          username: f.dataValues.username,
+          profilImage: f.dataValues.profilImage
+        })
+      });
+
+      results.artistFollowers = Followers
+    } else if (results.tracklist) {
       results.tracklist = results.tracklist.map((t) => {
         const track = t
         track.AudioCredits = track.AudioCredits.map(c => {

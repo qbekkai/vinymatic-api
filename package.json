@@ -9,8 +9,8 @@
     "serve:test": "NODE_ENV=test n use 16.3.0 server.js",
     "serve:test:debug": "NODE_ENV=test PORT_API=4001 n use 16.3.0 server.js",
     "serve:preProd": "NODE_ENV=preProd n use 16.3.0 server.js",
-    "serve:prod": "NODE_ENV=production n use 16.3.0 server.js",
-    "serve:prod:debug": "PORT_API=3002 NODE_ENV=production n use 16.3.0 server.js"
+    "serve:prod": "NODE_ENV=production node server.js",
+    "serve:prod:debug": "PORT_API=3002 NODE_ENV=production nodemon server.js"
   },
   "repository": {
     "type": "git",
@@ -38,6 +38,7 @@
     "fs": "^0.0.1-security",
     "get-mp3-duration": "^1.0.0",
     "google-auth-library": "^7.11.0",
+    "inflection": "^1.13.2",
     "js-yaml": "^4.1.0",
     "jsonwebtoken": "^8.5.1",
     "messagebird": "^3.6.4",

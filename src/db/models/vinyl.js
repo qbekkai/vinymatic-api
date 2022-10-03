@@ -85,7 +85,6 @@ module.exports = (sequelize, DataTypes) => {
     resourceUrl: DataTypes.STRING,
     images: DataTypes.JSON,
     thumbnail: DataTypes.STRING,
-    verify: DataTypes.BOOLEAN,
     MasterId: DataTypes.INTEGER,
     updatedAt: {
       type: DataTypes.DATEONLY,

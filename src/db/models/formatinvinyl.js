@@ -21,8 +21,8 @@ module.exports = (sequelize, DataTypes) => {
       FormatInVinyl.belongsTo(FormatVoice)
 
       FormatInVinyl.belongsToMany(FormatDescription, {
-        // through: DecriptionInFormaVinyl,
-        through: DecriptionInFormaVinyl, foreignKey: ['FormatInVinylsVinylId', 'FormatInVinylsFormatId']
+        through: DecriptionInFormaVinyl,
+        // through: DecriptionInFormaVinyl, foreignKey: ['FormatInVinylsVinylId', 'FormatInVinylsFormatId']
         // through: DecriptionInFormaVinyl, foreignKey: ['FormatInVinylsVinylId', 'FormatInVinylsFormatId'], otherKey: 'FormatDescriptionId'
         // through: DecriptionInFormaVinyl, foreignKey: 'FormatDescriptidonId', otherKey: ['FormatInVinylsVinylId', 'FormatInVinylsFormatId']
       })

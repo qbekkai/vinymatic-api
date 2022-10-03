@@ -17,12 +17,17 @@ module.exports = {
         matchDate = `${dateString}`.match(/^(?<year>\d{2,4})$/).groups
         date = `${matchDate.year}-01-01`
         break;
+      case /^\d{6,8}$/.test(dateString):
+        date = dateString;
+        break;
       default:
         console.log('le format de la date est inconnu ');
         throw { name: 'VinymaticApiInvalidDate' }
     }
 
-    return new Date(date).toISOString().slice(0, 10);
+    return /^\d{6,8}$/.test(dateString)
+      ? date
+      : new Date(date).toISOString().slice(0, 10)
   },
   dateFormaterTimestampToString: (timestamp) => {
     const date = new Date(timestamp * 1000);

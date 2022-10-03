@@ -16,6 +16,9 @@ router.route('/auth/apple').get(async (req, res, next) => { res.render('btnApple
 //   })
 
 require('./routes/__scraping/maj.routes')(router)
+require('./routes/__scraping/Scraping.routes')(router)
+require('./routes/__helpers/Helpers.routes')(router)
+
 
 // OWN
 require('./routes/Own/Collection.routes')(router)

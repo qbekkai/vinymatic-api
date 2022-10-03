@@ -4,7 +4,7 @@ module.exports = {
   Masters: ["id", "idMaster", "title", "releaseDate", "thumbnail", "masterUrl", "createdAt", "updatedAt",],
   Master: ["id", "idMaster", "title", "description", "releaseDate", "thumbnail", "images", "masterUrl", "tracklist"],
   Audio: ["id", "title", "position", "duration", "type", "credits", "audioUrl"],
-  Artists: ["id", "idArtist", "name", "thumbnail", "artistUrl", "resourceUrl",],
+  Artists: ["id", "idArtist", "name", "thumbnail", "artistUrl",],
   Artist: ["id", "idArtist", "name", "fullName", "aliasNames", "variantNames", "description", "inGroups", "thumbnail", "images", "artistUrl"],
   Labels: ["id", "idLabel", "name"],
   Label: ["id", "idLabel", "name"],

@@ -31,8 +31,8 @@ module.exports = (router) => {
           const options = {
             attributes: {
               include: [
-                [sequelize.fn("COUNT", sequelize.col("Followings->Follows.FollowingId")), "followings"],
-                [sequelize.fn("COUNT", sequelize.col("Followers->Follows.FollowerId")), "followers"]
+                [sequelize.fn("COUNT", sequelize.col("Followings->Follow.FollowingId")), "followings"],
+                [sequelize.fn("COUNT", sequelize.col("Followers->Follow.FollowerId")), "followers"]
               ],
               exclude: ["emailToken", "verifiedEmail", "verifiedPhone", "password"]
             },
@@ -40,7 +40,7 @@ module.exports = (router) => {
               { model: User, as: "Followings", attributes: [], through: { attributes: [] } },
               { model: User, as: "Followers", attributes: [], through: { attributes: [] } }
             ],
-            group: ["Followings->Follows.FollowingId", "Followers->Follows.FollowerId"],
+            group: ["Followings->Follow.FollowingId", "Followers->Follow.FollowerId"],
             where: { username },
             rejectOnEmpty: true
           }

@@ -424,7 +424,10 @@ module.exports = (router) => {
           //   next({ ...responseObject, resourceObject: { entity: 'artist' } })
           //   return response.json(responseObject)
           // }
-          res.status(500).json({ message: ErrorMessage.getMessageByStatusCode(500) })
+          if (/SequelizeEmptyResultError/.test(err.name))
+            return res.status(404).json({ message: 'NotFound' })
+
+          res.status(500).json({ message: 'Internal Error' })
           // next(err)
         }
       })
@@ -492,6 +495,30 @@ module.exports = (router) => {
 
           // if (err.name.localeCompare('SequelizeErrorsDatabaseError') === 0)
           //   return res.status(404).json({ message: ErrorMessage.getMessageByStatusCode(404) })
+
+          return res.status(500).json({ message: ErrorMessage.getMessageByStatusCode(500) })
+        }
+
+      })
+
+  router.route('/artist/:id/followers')
+    .get(
+      haveYouThePermission('readAny', 'all'),
+      async (req, res, next) => {
+        try {
+          const { id } = req.params
+
+          const artist = await Artist.findByPk(id)
+
+          const followers = await artist.getUsers()
+
+          console.log(followers)
+          req.results = { artistFollowers: followers }
+
+          next()
+        } catch (err) {
+          if (err.name.localeCompare(EMPTY_ERROR) === 0)
+            return res.status(404).json({ message: ErrorMessage.getMessageByStatusCode(404) })
 
           return res.status(500).json({ message: ErrorMessage.getMessageByStatusCode(500) })
         }

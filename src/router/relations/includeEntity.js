@@ -64,20 +64,77 @@ module.exports = {
           options.include.push({
             model: Label,
             as: 'VinylLabels',
-            attributes: [],
+            attributes: ["id", "name"],
             where: {
-              name: { [Op.substring]: value }
+              id: value
             }
           })
+          break;
         case /^artist/i.test(key):
           options.include.push({
             model: Artist,
             as: 'VinylMainArtists',
-            attributes: [],
+            attributes: ["name"],
             where: {
-              name: { [Op.substring]: value }
+              id: value
             }
           })
+          break;
+        case /^format/i.test(key):
+          let formatInVinylInclude = {}, formatInclude = {}, formatSizeInclude = {}, formatInVinylIncludeIndex = null, formatIncludeIndex = null
+
+          if (!options.include || (options.include && Array.isArray(options.include) && options.include.length == 0) || !options.include.find(i => i.model == FormatInVinyl)) {
+            formatInVinylInclude.model = Models.FormatInVinyl
+            formatInVinylInclude.include = []
+          } else {
+            formatInVinylInclude = options.include.find(i => i.model == FormatInVinyl)
+            formatInVinylIncludeIndex = options.include.findIndex(i => i.model == FormatInVinyl)
+          }
+
+
+          if (/^format$/i.test(key)) {
+            if (!formatInVinylInclude.include || (formatInVinylInclude.include && Array.isArray(formatInVinylInclude.include) && formatInVinylInclude.include.length == 0)) {
+              formatInclude.model = Models.FormatDescription
+              formatInclude.where = { name: { [Op.or]: [] } }
+            } else {
+              formatInclude = formatInVinylInclude.include.find(i => i.model == FormatDescription)
+              formatIncludeIndex = formatInVinylInclude.include.findIndex(i => i.model == FormatDescription)
+              if (!formatInclude) {
+                formatInclude = {}
+                formatInclude.model = Models.FormatDescription;
+                formatInclude.where = { name: { [Op.or]: [] } }
+              }
+            }
+
+            for (const val of value) formatInclude.where.name[Op.or].push({ [Op.substring]: val })
+
+            if (formatIncludeIndex && formatIncludeIndex >= 0) formatInVinylInclude.include.splice(formatIncludeIndex, 1, formatInclude)
+            else formatInVinylInclude.include.push(formatInclude)
+
+
+          } else if (/^formatSize$/i.test(key)) {
+            if (!formatInVinylInclude.include || (formatInVinylInclude.include && Array.isArray(formatInVinylInclude.include) && formatInVinylInclude.include.length == 0)) {
+              formatSizeInclude.model = Models.FormatSize;
+              formatSizeInclude.where = { name: { [Op.or]: [] } }
+            } else {
+              formatSizeInclude = formatInVinylInclude.include.find(i => i.model == FormatSize)
+              formatIncludeIndex = formatInVinylInclude.include.findIndex(i => i.model == FormatSize)
+              if (!formatSizeInclude) {
+                formatSizeInclude = {}
+                formatSizeInclude.model = Models.FormatSize;
+                formatSizeInclude.where = { name: { [Op.or]: [] } }
+              }
+            }
+
+            for (const val of value) formatSizeInclude.where.name[Op.or].push({ [Op.substring]: val })
+
+
+            if (formatIncludeIndex && formatIncludeIndex >= 0) formatInVinylInclude.include.splice(formatIncludeIndex, 1, formatSizeInclude)
+            else formatInVinylInclude.include.push(formatSizeInclude)
+          }
+
+          if (formatInVinylIncludeIndex && formatInVinylIncludeIndex >= 0) options.include.splice(formatInVinylIncludeIndex, 1, formatInVinylInclude)
+          else options.include.push(formatInVinylInclude)
           break;
         case /allnull/i.test(key):
           let field = ''
@@ -100,7 +157,7 @@ module.exports = {
     const route = actualRoute;
     const mainModel = getModelByRoute(route)
     const options = optionsReq
-    const qs = qsParams && !qsParams.order
+    const qs = qsParams && !qsParams.orderBy
       ? { order: { by: 'id', direction: 'ASC' } }
       : qsParams
 
