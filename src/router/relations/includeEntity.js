@@ -66,16 +66,17 @@ module.exports = {
             as: 'VinylLabels',
             attributes: [],
             where: {
-              name: { [Op.substring]: value }
+              id: value
             }
           })
+          break;
         case /^artist/i.test(key):
           options.include.push({
             model: Artist,
             as: 'VinylMainArtists',
-            attributes: [],
+            attributes: ["name"],
             where: {
-              name: { [Op.substring]: value }
+              id: value
             }
           })
           break;

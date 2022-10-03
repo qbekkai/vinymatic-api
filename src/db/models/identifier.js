@@ -24,7 +24,7 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'Identifier',
-    updatedAt: false
+    timestamps: false
   });
   return Identifier;
 };

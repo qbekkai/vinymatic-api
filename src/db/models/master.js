@@ -44,7 +44,6 @@ module.exports = (sequelize, DataTypes) => {
     images: DataTypes.JSON,
     thumbnail: DataTypes.STRING,
     tracklist: DataTypes.JSON,
-    verify: DataTypes.BOOLEAN,
     updatedAt: {
       type: DataTypes.DATEONLY,
       defaultValue: new Date()

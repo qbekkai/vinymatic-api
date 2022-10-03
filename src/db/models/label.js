@@ -29,18 +29,18 @@ module.exports = (sequelize, DataTypes) => {
     name: DataTypes.STRING,
     thumbnail: DataTypes.STRING,
     images: DataTypes.JSON,
-    verify: DataTypes.BOOLEAN,
-    updatedAt: {
-      type: DataTypes.DATEONLY,
-      defaultValue: new Date()
-    },
-    createdAt: {
-      type: DataTypes.DATEONLY,
-      defaultValue: new Date()
-    }
+    // updatedAt: {
+    //   type: DataTypes.DATEONLY,
+    //   defaultValue: new Date()
+    // },
+    // createdAt: {
+    //   type: DataTypes.DATEONLY,
+    //   defaultValue: new Date()
+    // }
   }, {
     sequelize,
-    modelName: 'Label'
+    modelName: 'Label',
+    timestamps: false
   });
   return Label;
 };

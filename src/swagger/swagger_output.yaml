@@ -581,6 +581,24 @@ paths:
           description: Internal Server Error
       security:
       - bearerAuth: []
+  "/artist/{id}/followers":
+    get:
+      tags:
+      - Artist
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/idParam"
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []    
   "/artist/{id}/discography":
     get:
       tags:
@@ -2274,16 +2292,48 @@ paths:
       parameters:
       - name: releaseDate
         in: query
+        description: "Filtre"
         schema:
           type: string
       - name: country
         in: query
+        description: "Filtre"
         schema:
           type: string
+      - name: artist
+        in: query
+        description: "Filtre"
+        schema:
+          type: integer
       - name: label
         in: query
+        description: "Filtre"
         schema:
+          type: integer
+      - name: format
+        in: query
+        description: "Filtre"
+        schema: 
           type: string
+      - name: formatSize
+        in: query
+        description: "Filtre"
+        schema: 
+          type: string
+      - name: sort[by][]
+        in: query
+        description: "Tri<br><br>Exemple query avec 1 tri : \"sort[by][]=artist&sort[direction][]=asc\"<br>__Valeur possible__ : artist, releaseDate"
+        schema: 
+          type: array
+          items: 
+            type: string
+      - name: sort[direction][]
+        in: query
+        description: "Tri<br><br>Exemple query avec 2 tris ou plus : \"sort[by][]=artist&sort[direction][]=acs&sort[by][]=releaseDate&sort[direction][]=desc\"<br>__Valeur possible__ : asc, desc"
+        schema: 
+          type: array
+          items: 
+            type: string
       - $ref: "#/components/parameters/pageParam"
       - $ref: "#/components/parameters/limitParam"
       responses:
@@ -2382,6 +2432,14 @@ paths:
           type: boolean
       - name: whichUser
         example: 3
+        in: query
+        schema:
+          type: integer
+      - name: page
+        in: query
+        schema:
+          type: integer
+      - name: limit
         in: query
         schema:
           type: integer

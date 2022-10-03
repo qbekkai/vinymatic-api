@@ -25,8 +25,8 @@ module.exports = (router) => {
               image: t.image,
               // freeCondition: t.freeCondition,
               deliveryDelay: t.deliveryDelay,
-              freeCondition: t.UserTransporters.freeCondition,
-              continents: t.UserTransporters.continents
+              freeCondition: t.UserTransporter.freeCondition,
+              continents: t.UserTransporter.continents
             }
           })
 
@@ -48,7 +48,7 @@ module.exports = (router) => {
           const { transporterId } = params
           const { freeCondition, continents } = body
 
-          const transporterGetted = await Transporter.findOne({ where: { id: transporterId } })
+          const transporterGetted = await Transporter.findOne({ where: { id: transporterId }, rejectOnEmpty: true })
           const transporterAdded = await user.addTransporter(transporterGetted, { through: { freeCondition, continents } })
 
           const result = {
@@ -77,7 +77,8 @@ module.exports = (router) => {
           const transporterGetted = (await user.getTransporters({
             where: {
               id: transporterId
-            }
+            },
+            rejectOnEmpty: true
           }))[0]
 
           await user.removeTransporter(transporterGetted)

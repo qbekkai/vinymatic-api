@@ -7,6 +7,7 @@ const { EMPTY_ERROR, REFERENCE_ERROR, MALFORMED_TOKEN_ERROR, EXPIRED_TOKEN_ERROR
 const Tools = require('../../tools/tools')
 const includeEntity = require('../relations/includeEntity')
 const { haveYouThePermission } = require('../../auth/accessControl')
+const { getPaginationsOptions } = require('../relations/includeEntity')
 
 
 module.exports = (router) => {
@@ -18,22 +19,25 @@ module.exports = (router) => {
           const { query } = req
           let { by, isInCollection, isInWishlist, whichUser, isVariousArtist } = query
 
-          isInCollection = isInCollection.localeCompare('true') === 0 ? true : false
-          isInWishlist = isInWishlist.localeCompare('true') === 0 ? true : false
-          isVariousArtist = isVariousArtist.localeCompare('true') === 0 ? true : false
+          isInCollection = isInCollection && isInCollection.localeCompare('true') === 0 ? true : false
+          isInWishlist = isInWishlist && isInWishlist.localeCompare('true') === 0 ? true : false
+          isVariousArtist = isVariousArtist && isVariousArtist.localeCompare('true') === 0 ? true : false
 
           let mainOptions = {}
           const vinylOptions = {
-            model: Vinyl,
             attributes: ["id", "idRelease", "title", "thumbnail", "vinylUrl", "resourceUrl"],
             include: [],
-            where: { [Op.or]: [] }
+            where: { [Op.or]: [] },
+            subQuery: false
           }
 
           if (by) {
             for (const searchParamKey of Object.keys(by)) {
               const searchParamValue = by[searchParamKey]
               switch (true) {
+                case /vinylTitle/.test(searchParamKey):
+                  vinylOptions.where[Op.or].push({ title: { [Op.substring]: searchParamValue } })
+                  break;
                 case /labelName/.test(searchParamKey):
                   vinylOptions.include.push({
                     model: Label, as: "VinylLabels",
@@ -61,9 +65,6 @@ module.exports = (router) => {
                   })
 
                   vinylOptions.where[Op.or].push({ "$VinylMainArtists.name$": { [Op.substring]: searchParamValue } })
-                  break;
-                case /vinylTitle/.test(searchParamKey):
-                  vinylOptions.where[Op.or].push({ title: { [Op.substring]: searchParamValue } })
                   break;
                 case /genreName/.test(searchParamKey):
                   vinylOptions.include.push({
@@ -134,9 +135,11 @@ module.exports = (router) => {
               case !!isInCollection && !isInWishlist: itemFound = await Collection.findOne(mainOptions); break;
             }
             vinylGetted = await itemFound.getVinyls(vinylOptions)
-          } else
+          } else {
+            const paginations = Tools.pagination(query);
+            mainOptions = { ...mainOptions, ...paginations }
             vinylGetted = await Vinyl.findAll(mainOptions)
-
+          }
 
           req.results = { vinyls: vinylGetted }
           next()

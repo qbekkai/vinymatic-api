@@ -29,7 +29,9 @@ module.exports = (sequelize, DataTypes) => {
     coverCondition: DataTypes.STRING,
     isSelled: DataTypes.BOOLEAN,
     UserId: DataTypes.INTEGER,
-    VinylId: DataTypes.INTEGER
+    VinylId: DataTypes.INTEGER,
+    createdAt: DataTypes.DATE,
+    updatedAt: DataTypes.DATE
   }, {
     sequelize,
     modelName: 'Selling',

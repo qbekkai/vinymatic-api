@@ -115,23 +115,13 @@ module.exports = (router) => {
 
           res.status(201).json({ user, sell: sellingFound });
         } catch (err) {
-          console.log(err)
-          if (
-            err instanceof ValidationError ||
-            err instanceof UniqueConstraintError
-          )
-            return res
-              .status(400)
-              .json({ message: ErrorMessage.getMessageByStatusCode(400) });
+          if (err instanceof ValidationError || err instanceof UniqueConstraintError)
+            return res.status(400).json({ message: ErrorMessage.getMessageByStatusCode(400) });
 
           if (err.name.localeCompare(EMPTY_ERROR) === 0)
-            return res
-              .status(404)
-              .json({ message: ErrorMessage.getMessageByStatusCode(404) });
+            return res.status(404).json({ message: ErrorMessage.getMessageByStatusCode(404) });
 
-          return res
-            .status(500)
-            .json({ message: ErrorMessage.getMessageByStatusCode(500) });
+          return res.status(500).json({ message: ErrorMessage.getMessageByStatusCode(500) });
         }
       });
 
