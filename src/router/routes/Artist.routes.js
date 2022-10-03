@@ -512,7 +512,7 @@ module.exports = (router) => {
 
           const followers = await artist.getUsers()
 
-          // console.log(followers)
+          console.log(followers)
           req.results = { artistFollowers: followers }
 
           next()
@@ -522,6 +522,7 @@ module.exports = (router) => {
 
           return res.status(500).json({ message: ErrorMessage.getMessageByStatusCode(500) })
         }
+
       })
 }
 

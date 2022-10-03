@@ -367,5 +367,32 @@ module.exports = (router) => {
           return res.status(500).json({ message: ErrorMessage.getMessageByStatusCode(500) })
         }
       })
+
+
+  router.route('/label/:id/followers')
+    .get(
+      haveYouThePermission('readAny', 'all'),
+      async (req, res, next) => {
+        try {
+          const { id } = req.params
+
+          const options = { attributes: ["id", "username", "profilImage"], through: { attributes: [] } }
+
+          const label = await Label.findByPk(id)
+
+          const followers = await label.getUsers(options)
+
+          // 	console.log(followers)
+          req.results = { labelFollowers: followers }
+
+          next()
+        } catch (err) {
+          if (err.name.localeCompare(EMPTY_ERROR) === 0)
+            return res.status(404).json({ message: ErrorMessage.getMessageByStatusCode(404) })
+
+          return res.status(500).json({ message: ErrorMessage.getMessageByStatusCode(500) })
+        }
+
+      })
 }
 

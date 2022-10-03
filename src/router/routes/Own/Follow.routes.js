@@ -1,4 +1,4 @@
-const { User, sequelize } = require('./../../../db/models')
+const { Label, User, sequelize } = require('./../../../db/models')
 const ErrorMessage = require('../../../error/messages')
 const { EMPTY_ERROR, REFERENCE_ERROR, MALFORMED_TOKEN_ERROR, EXPIRED_TOKEN_ERROR, IS_LOGIN_ERROR, ALREADY_USED_CODE_ERROR, INVALID_CODE_ERROR, EXPIRED_CODE_ERROR, NO_EMAIL_NO_PHONENUMBER_ERROR, USER_INVALID_PASSWORD_ERROR, NO_USER_ERROR, NO_CRITRIA_ERROR, ALREADY_EXIST_ERROR, NOT_EXIST_ERROR, NO_MODIFICATION_ERROR, NO_ENTITY_SELECTED_ERROR, ANONYMOUS_USER_ERROR } = require('../../../error/constError')
 const { haveYouThePermission } = require('../../../auth/accessControl')
@@ -13,9 +13,10 @@ module.exports = (router) => {
         try {
 
           const { user, query } = req
-          const { counting, isArtist, page = null, limit = null } = query
+          const { counting, isArtist, isLabel, page = null, limit = null } = query
 
           const isArtistBoolean = isArtist ? tools.isBooleanFromString(isArtist) : null
+          const isLabelBoolean = isLabel ? tools.isBooleanFromString(isLabel) : null
           const coutingBoolean = counting ? tools.isBooleanFromString(counting) : null
           const pagination = tools.pagination({ page, limit })
 
@@ -35,7 +36,22 @@ module.exports = (router) => {
               artists.map(a => delete a.dataValues.ArtistFollowers)
               return res.status(200).json({ own: user, ArtistsFollowing: artists })
             }
+          } else if (isLabelBoolean) {
+            const options = {
+              attributes: ["id", "name", "thumbnail"],
+              through: { attributes: [] },
+              ...pagination
+            }
 
+            let labels = null
+            if (coutingBoolean) {
+              labels = await user.countLabels(options)
+              return res.status(200).json({ own: user, LabelsFollowingCount: labels })
+            } else {
+              labels = await user.getLabels(options)
+              labels.map(a => delete a.dataValues.LabelsFollowers)
+              return res.status(200).json({ own: user, LabelsFollowing: labels })
+            }
           } else {
             const options = {
               attributes: ["id", "username", "showName", "email", "phoneNumber", "profilImage", "role"],
@@ -103,7 +119,10 @@ module.exports = (router) => {
           if (isArtist === 'true') {
             const artistActingFound = await Artist.findByPk(id, { attributes: ["id"], rejectOnEmpty: true })
             await _selfUser.addArtist(artistActingFound)
-          } else if (isArtist === 'false' || !isArtist) {
+          } else if (isLabel === 'true') {
+            const labelActingFound = await Label.findByPk(id, { attributes: ["id"], rejectOnEmpty: true })
+            await _selfUser.addLabel(labelActingFound)
+          } else if ((isArtist === 'false' || !isArtist) && (isLabel === 'false' || !isLabel)) {
             const userActingFound = await User.findByPk(id, { attributes: ["id"], rejectOnEmpty: true })
             await _selfUser.addFollowing(userActingFound)
           }
@@ -134,6 +153,9 @@ module.exports = (router) => {
           if (isArtist === 'true') {
             const artistActingFound = await Artist.findByPk(id, { attributes: ["id"], rejectOnEmpty: true })
             await _selfUser.removeArtist(artistActingFound)
+          } else if (isLabel === 'true') {
+            const labelActingFound = await Label.findByPk(id, { attributes: ["id"], rejectOnEmpty: true })
+            await _selfUser.removeLabel(labelActingFound)
           } else if (isArtist === 'false' || !isArtist) {
             const userActingFound = await User.findByPk(id, { attributes: ["id"], rejectOnEmpty: true })
             await _selfUser.removeFollowing(userActingFound)
