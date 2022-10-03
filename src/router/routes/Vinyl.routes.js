@@ -59,11 +59,17 @@ module.exports = (router) => {
           if (sort) {
             for (let orderIndex = 0; orderIndex < sort.by.length; orderIndex++) {
               switch (true) {
-                case /artist/i.test(sort.by[orderIndex]):
-                  options = sorts.byMainArtist(sort.direction[orderIndex], options);
+                case /title/i.test(sort.by[orderIndex]):
+                  options = sorts.byTitle(sort.direction[orderIndex], options);
                   break;
                 case /releaseDate/i.test(sort.by[orderIndex]):
                   options = sorts.byReleaseDate(sort.direction[orderIndex], options);
+                  break;
+                case /artist/i.test(sort.by[orderIndex]):
+                  options = sorts.byMainArtist(sort.direction[orderIndex], options);
+                  break;
+                case /label/i.test(sort.by[orderIndex]):
+                  options = sorts.byLabel(sort.direction[orderIndex], options);
                   break;
                 default: throw { name: 'VinymaticApiRequestError:SortNotExist' }
               }
@@ -319,7 +325,8 @@ module.exports = (router) => {
 
 
   router.route('/vinyls/idRelease')
-    .post(haveYouThePermission('createOwn', 'vinyl'),
+    .post(
+      haveYouThePermission('createOwn', 'vinyl'),
       async (req, res, next) => {
         try {
           let { body: { idRelease } } = req
@@ -1019,6 +1026,45 @@ module.exports = (router) => {
             return res.status(404).json({ message: err.message.replace(/key/, 'file') })
 
           res.status(500).json({ msg: 'Internal Error' })
+        }
+      })
+
+
+  router.route('/vinyl/:id/discography')
+    .get(
+      haveYouThePermission('readAny', 'all'),
+      async (req, res, next) => {
+        try {
+          const { params } = req
+          const { id } = params
+
+          const options = {
+            attributes: ["id", "title", "thumbnail", "releaseDate", "country"],
+            include: [
+              { model: Artist, as: "VinylMainArtists", attributes: ["id", "idArtist", "name", "thumbnail", "artistUrl", "resourceUrl"], through: { attributes: [] } },
+              { model: Label, as: "VinylLabels", attributes: ["id", "idLabel", "name", "thumbnail"], through: { attributes: ["catno"] } },
+            ],
+            rejectOnEmpty: true
+          }
+
+          const vinylFound = await Vinyl.findByPk(id, options);
+
+          const as = new ApiService({ baseURL: `${URL_API}:${PORT_API}`, token: `${TOKEN_API}` })
+          const vinylFormatGetted = (await as.doRequest('get', `/vinyl/${id}/formats`)).data
+
+
+          vinylFound.dataValues = {
+            ...vinylFound.dataValues,
+            Formats: vinylFormatGetted.formats,
+          }
+
+          req.results = { vinyl: vinylFound }
+          next()
+
+        } catch (err) {
+          if (err.name.localeCompare(EMPTY_ERROR) === 0)
+            return res.status(404).json({ message: ErrorMessage.getMessageByStatusCode(404) })
+          return res.status(500).json({ message: ErrorMessage.getMessageByStatusCode(500) })
         }
       })
 }

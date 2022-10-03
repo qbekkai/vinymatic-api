@@ -34,6 +34,8 @@ module.exports = (sequelize, DataTypes) => {
         Follow,
         UserTransporter,
         ArtistFollower,
+        Label,
+        LabelFollower
       } = models;
 
       User.hasOne(Collection)
@@ -58,6 +60,7 @@ module.exports = (sequelize, DataTypes) => {
       User.belongsToMany(User, { through: Follow, as: "Followings", foreignKey: 'FollowingId', otherKey: "FollowerId" })
       User.belongsToMany(Transporter, { through: UserTransporter, as: "Transporters" })
       User.belongsToMany(Artist, { through: ArtistFollower })
+      User.belongsToMany(Label, { through: LabelFollower })
     }
   }
   User.init({

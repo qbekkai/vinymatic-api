@@ -1143,6 +1143,24 @@ paths:
           description: Internal Server Error
       security:
       - bearerAuth: []
+  "/label/{id}/followers":
+    get:
+      tags:
+      - Label
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/idParam"
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []        
   "/identifiers/types":
     get:
       tags:
@@ -1160,6 +1178,7 @@ paths:
           description: Internal Server Error
       security:
       - bearerAuth: []
+      
 # Master ✔︎
   "/masters":
     get:
@@ -2310,16 +2329,20 @@ paths:
         description: "Filtre"
         schema:
           type: integer
-      - name: format
+      - name: format[]
         in: query
         description: "Filtre"
         schema: 
-          type: string
-      - name: formatSize
+          type: array
+          items: 
+            type: string
+      - name: formatSize[]
         in: query
         description: "Filtre"
         schema: 
-          type: string
+          type: array
+          items: 
+            type: string
       - name: sort[by][]
         in: query
         description: "Tri<br><br>Exemple query avec 1 tri : \"sort[by][]=artist&sort[direction][]=asc\"<br>__Valeur possible__ : artist, releaseDate"
@@ -2432,14 +2455,6 @@ paths:
           type: boolean
       - name: whichUser
         example: 3
-        in: query
-        schema:
-          type: integer
-      - name: page
-        in: query
-        schema:
-          type: integer
-      - name: limit
         in: query
         schema:
           type: integer
@@ -2692,6 +2707,25 @@ paths:
           description: Internal Server Error
       security:
       - bearerAuth: []
+  "/vinyl/{id}/discography":
+    get:
+      tags:
+      - Vinyl
+      description: ""
+      parameters:
+      - $ref: "#/components/parameters/idParam"
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+    
 # Own Collection ✔︎
   "/own/collection":
     get:
@@ -2869,6 +2903,10 @@ paths:
         schema:
           type: boolean 
       - in: query
+        name: isLabel
+        schema:
+          type: boolean 
+      - in: query
         name: counting
         schema:
           type: boolean
@@ -2924,7 +2962,11 @@ paths:
       - in: query
         name: isArtist
         schema:
-          type: boolean    
+          type: boolean
+      - in: query
+        name: isLabel
+        schema:
+          type: boolean            
       responses:
         "201":
           description: Created
@@ -2955,6 +2997,10 @@ paths:
           type: integer
       - in: query
         name: isArtist
+        schema:
+          type: boolean    
+      - in: query
+        name: isLabel
         schema:
           type: boolean    
       responses:
@@ -3882,6 +3928,12 @@ components:
       required: true
       schema:
         type: integer
+    orderByParam:
+      name: orderBy
+      in: query
+      required: false
+      schema:
+        type: string    
     userParam:
       name: username
       in: path

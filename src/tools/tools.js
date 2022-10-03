@@ -1,9 +1,10 @@
 const Op = require('sequelize').Op;
 const fs = require('fs')
+const inflection = require('inflection')
 const mime = require('mime')
 const fetch = require('node-fetch');
 
-const { Article, Artist, Format, SubFormat, Genre, Style, Label } = require('../db/models')
+const Models = { Article, Artist, Format, SubFormat, Genre, Style, Label } = require('../db/models')
 
 
 module.exports = {
@@ -84,6 +85,60 @@ module.exports = {
     }
 
     return { order }
+  },
+  orderingTmp: (orders, options = {}) => {
+    let orderBy = null
+    const ordering = []
+    if (!orders) orderBy = [{ by: 'id', direction: 'ASC' }]
+    else orderBy = orders
+
+    for (const order of orderBy) {
+      let qsOrder = [
+        order.direction.toUpperCase()
+      ]
+
+      switch (true) {
+        case /releaseDate/i.test(order.by):
+          qsOrder = [
+            "releaseDate",
+            ...qsOrder
+          ]
+          break;
+        case /mainArtists/i.test(order.by):
+          orderAssociation = [
+            Models.Vinyl.associations.VinylMainArtists,
+            "name",
+            ...qsOrder
+          ]
+          break;
+        default: break;
+      }
+
+
+      // if (order.nested) {
+      //   let orderAssociation = null
+      //   switch (true) {
+      //     case /mainArtists/i.test(order.nested):
+      //       orderAssociation = [
+      //         Models.Vinyl.associations.VinylMainArtists,
+      //         "VinylId"
+      //       ]
+      //       break;
+      //     default: break;
+      //   }
+
+      // //   ordering.push([
+      //     ...orderAssociation,
+      //     ...qsOrder
+      //   ])
+      // } else
+      //   ordering.push([
+      //     order.by,
+      //     ...qsOrder
+      //   ])
+    }
+
+    return { order: ordering }
   },
   filter: (qsParams, options = {}) => {
     const where = {};

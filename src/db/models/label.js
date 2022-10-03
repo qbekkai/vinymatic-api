@@ -11,14 +11,14 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      const { Vinyl, Label, SocietesInVinyl, LabelsInVinyl, Serie } = models;
+      const { User, Vinyl, Label, SocietesInVinyl, LabelsInVinyl, Serie, LabelFollower } = models;
 
-      Label.belongsToMany(Vinyl, { through: LabelsInVinyl, as: "VinylLabels" });
+      Label.belongsToMany(Vinyl, { through: LabelsInVinyl, as: "VinylLabels", updatedAt: false, createdAt: false });
       Label.belongsToMany(Vinyl, { through: SocietesInVinyl, as: "VinylSocietes" });
       Label.belongsToMany(Vinyl, { through: Serie, as: "VinylSeries" });
-
+      Label.belongsToMany(User, { through: LabelFollower })
     }
-  }
+  };
   Label.init({
     idLabel: {
       type: DataTypes.INTEGER,
@@ -28,19 +28,12 @@ module.exports = (sequelize, DataTypes) => {
     },
     name: DataTypes.STRING,
     thumbnail: DataTypes.STRING,
-    images: DataTypes.JSON,
-    // updatedAt: {
-    //   type: DataTypes.DATEONLY,
-    //   defaultValue: new Date()
-    // },
-    // createdAt: {
-    //   type: DataTypes.DATEONLY,
-    //   defaultValue: new Date()
-    // }
+    images: DataTypes.JSON
   }, {
     sequelize,
     modelName: 'Label',
-    timestamps: false
+    updatedAt: false,
+    createdAt: false
   });
   return Label;
 };
