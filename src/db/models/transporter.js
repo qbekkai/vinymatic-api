@@ -22,7 +22,8 @@ module.exports = (sequelize, DataTypes) => {
     deliveryDelay: DataTypes.JSON
   }, {
     sequelize,
-    modelName: 'Transporter'
+    modelName: 'Transporter',
+    timestamps: false
   });
   return Transporter;
 };

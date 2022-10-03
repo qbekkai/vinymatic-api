@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
   }
   VinylsAsGenre.init({
     VinylId: DataTypes.INTEGER,
-    GentreId: DataTypes.INTEGER
+    GenreId: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'VinylsAsGenre',

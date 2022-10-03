@@ -12,7 +12,7 @@ module.exports = (router) => {
       async (req, res, next) => {
         try {
           const options = {
-            attributes: ["price", "devise", "coverCondition", "diskCondition", "isSelled", "additionalImages"],
+            attributes: ["price", "devise", "coverCondition", "diskCondition", "isSelled", "additionalImages", "createdAt", "updatedAt"],
             include: [
               {
                 model: Vinyl, attributes: ["id", "title", "thumbnail", "country", "releaseDate"], include: [

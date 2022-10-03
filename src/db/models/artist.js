@@ -54,8 +54,7 @@ module.exports = (sequelize, DataTypes) => {
     images: DataTypes.JSON,
     thumbnail: DataTypes.STRING,
     artistUrl: DataTypes.STRING,
-    resourceUr: DataTypes.STRING,
-    verify: DataTypes.BOOLEAN
+    resourceUrl: DataTypes.STRING,
   }, {
     sequelize,
     modelName: 'Artist',

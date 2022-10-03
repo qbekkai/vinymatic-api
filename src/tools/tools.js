@@ -40,6 +40,13 @@ module.exports = {
     const offset = params.page && params.page > 0 ? +(((params.page - 1) * limit)) : 0;
     return { limit, offset };
   },
+  nPagination: (params, fullOption) => {
+    const options = fullOption
+    if (params.isNoLimitPagination) return {}
+    options.limit = params.limit ? +(params.limit) : 10;
+    options.offset = params.page && params.page > 0 ? +(((params.page - 1) * limit)) : 0;
+    return options;
+  },
   rangeFilter: (where, filterName, filter) => {
     const item = {
       min: filter.min ? +(filter.min) : 0,

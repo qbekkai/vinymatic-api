@@ -37,7 +37,7 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'Audio',
-    updatedAt: false
+    timestamps: false
   });
   return Audio;
 };

@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
   }
   MastersAsGenre.init({
     MasterId: DataTypes.INTEGER,
-    GentreId: DataTypes.INTEGER
+    GenreId: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'MastersAsGenre',

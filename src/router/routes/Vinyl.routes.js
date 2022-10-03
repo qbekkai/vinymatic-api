@@ -23,8 +23,9 @@ const ImageManagement = require('../../tools/ImageManagement.tool')
 
 
 const { addFormat } = require('../../tools/format.tool')
-
-
+const { getOrderOptions, getFilterOptions } = require('../relations/includeEntity')
+const filters = require('../filters')
+const sorts = require('../sorts')
 
 
 
@@ -35,70 +36,39 @@ module.exports = (router) => {
       async (req, res, next) => {
         try {
           const { query, url } = req;
-          let { getIdRelease, isNoLimitPagination, isForScrapingMaj, isErreurScraping } = query;
+          let { getIdRelease, isNoLimitPagination, isForScrapingMaj, isErreurScraping, sort } = query;
           isErreurScraping = isErreurScraping == 'true' ? true : false
           isForScrapingMaj = isForScrapingMaj == 'true' ? true : false
 
-          let where = {}
-          if (isForScrapingMaj) {
-            where = {
-              [Op.and]: [
-                { idRelease: { [Op.not]: null } },
-                {
-                  thumbnail: {
-                    [Op.or]: [
-                      { [Op.is]: null },
-                      { [Op.substring]: '%discogs%' }
-                    ]
-                  }
-                },
-                {
-                  images: {
-                    [Op.or]: [
-                      { [Op.is]: null },
-                      { [Op.substring]: '%discogs%' }
-                    ]
-                  }
-                },
-              ]
-            }
 
-          } else if (isErreurScraping) {
-            where = {
-              [Op.and]: [{ idRelease: { [Op.is]: null } }]
-            }
-          } else {
-            where = {
-              [Op.and]: [
-                { idRelease: { [Op.not]: null } },
-                {
-                  thumbnail: {
-                    [Op.and]: [
-                      { [Op.not]: null },
-                      { [Op.notLike]: '%discogs%' }
-                    ]
-                  }
-                },
-                {
-                  images: {
-                    [Op.and]: [
-                      { [Op.not]: null },
-                      { [Op.notLike]: '%discogs%' }
-                    ]
-                  }
-                },
-              ]
+          let options = {
+            attributes: getIdRelease
+              ? ["idRelease"]
+              : ["id", "idRelease", "title", "releaseDate", "thumbnail", "vinylUrl", "resourceUrl"],
+            include: [],
+            order: []
+            // raw: true
+          }
+          options = Tools.nPagination(query, options);
+          options = filters.byVerified(url, query, options)
+          options = getFilterOptions(url, query, options)
+
+          // if (query.formatSize) options = filters.byFormatSize(query.formatSize, options)
+          // if (query.format) options = filters.byFormat(query.format, options)
+
+          if (sort) {
+            for (let orderIndex = 0; orderIndex < sort.by.length; orderIndex++) {
+              switch (true) {
+                case /artist/i.test(sort.by[orderIndex]):
+                  options = sorts.byMainArtist(sort.direction[orderIndex], options);
+                  break;
+                case /releaseDate/i.test(sort.by[orderIndex]):
+                  options = sorts.byReleaseDate(sort.direction[orderIndex], options);
+                  break;
+                default: throw { name: 'VinymaticApiRequestError:SortNotExist' }
+              }
             }
           }
-
-
-          const paginations = Tools.pagination(query);
-          const options = {
-            attributes: ["id", "idRelease", "title", "releaseDate", "thumbnail", "vinylUrl", "resourceUrl"],
-            ...paginations
-          }
-          if (getIdRelease) options.attributes = ["idRelease"]
-          options.where = { ...where, ...options.where }
 
           // const options = includeEntity.getOptionsForSQLRequest(includeEntity, url, query, { getIdRelease, isNoLimitPagination })
           // const options = {
@@ -108,7 +78,10 @@ module.exports = (router) => {
           const vinyls = await Vinyl.findAll(options)
           res.status(200).json({ vinyls })
         } catch (err) {
-          return res.status(500).json({ message: ErrorMessage.getMessageByStatusCode(500) })
+          if (/VinymaticApiRequestError:SortNotExist/.test(err.name))
+            return res.status(400).json({ message: "VinymaticApiRequestError:SortNotExist" })
+
+          res.status(500).json({ message: ErrorMessage.getMessageByStatusCode(500) })
         }
       })
     .post(
@@ -477,9 +450,12 @@ module.exports = (router) => {
               /** Credit */
               if (track.credits && Array.isArray(track.credits)) {
                 for (const c of track.credits) {
-                  const artistFound = await Artist.findOne({ where: { idArtist: c.creditArtistId } })
+                  let artistFound = null
+                  if (c.creditArtistId) artistFound = await Artist.findOne({ where: { idArtist: c.creditArtistId } })
+                  else artistFound = await Artist.findOne({ where: { name: c.creditArtistName } })
+
                   if (artistFound !== null) await artistFound.addAudioCredit(audioCreated, { through: { roleCredit: c.creditRole, typeCredit: 'AUDIO_CREDIT' } })
-                  else await audioCreated.createAudioCredit({ idArtist: c.creditArtistId }, { through: { roleCredit: c.creditRole, typeCredit: 'AUDIO_CREDIT' } })
+                  else await audioCreated.createAudioCredit({ idArtist: c.creditArtistId ? c.creditArtistId : null }, { through: { roleCredit: c.creditRole, typeCredit: 'AUDIO_CREDIT' } })
                 }
               }
             }
