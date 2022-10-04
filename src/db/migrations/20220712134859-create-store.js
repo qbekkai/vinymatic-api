@@ -19,13 +19,13 @@ module.exports = {
         type: Sequelize.TEXT
       },
       images: {
-        type: Sequelize.JSONB
+        type: Sequelize.JSON
       },
       formattedAddress: {
         type: Sequelize.STRING
       },
       geometry: {
-        type: Sequelize.JSONB
+        type: Sequelize.JSON
       },
       rating: {
         type: Sequelize.FLOAT
@@ -34,28 +34,28 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       hours: {
-        type: Sequelize.JSONB
+        type: Sequelize.JSON
       },
       contacts: {
-        type: Sequelize.JSONB
+        type: Sequelize.JSON
       },
       types: {
-        type: Sequelize.JSONB
+        type: Sequelize.JSON
       },
       genres: {
-        type: Sequelize.JSONB
+        type: Sequelize.JSON
       },
       formats: {
-        type: Sequelize.JSONB
+        type: Sequelize.JSON
       },
       styles: {
-        type: Sequelize.JSONB
+        type: Sequelize.JSON
       },
       mainSells: {
-        type: Sequelize.JSONB
+        type: Sequelize.JSON
       },
       otherSells: {
-        type: Sequelize.JSONB
+        type: Sequelize.JSON
       }
     });
   },

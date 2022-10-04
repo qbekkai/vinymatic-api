@@ -73,15 +73,15 @@ module.exports = {
         unique: true
       },
       preferences: {
-        type: Sequelize.JSONB,
+        type: Sequelize.JSON,
         defaultValue: {}
       },
       createdAt: {
-        type: Sequelize.DATEONLY,
+        type: Sequelize.DATE,
         defaultValue: new Date()
       },
       updatedAt: {
-        type: Sequelize.DATEONLY,
+        type: Sequelize.DATE,
         defaultValue: new Date()
       }
     });

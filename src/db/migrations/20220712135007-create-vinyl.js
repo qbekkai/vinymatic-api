@@ -31,7 +31,7 @@ module.exports = {
         type: Sequelize.STRING
       },
       images: {
-        type: Sequelize.JSONB
+        type: Sequelize.JSON
       },
       thumbnail: {
         type: Sequelize.STRING
@@ -44,11 +44,11 @@ module.exports = {
         type: Sequelize.INTEGER,
       },
       createdAt: {
-        type: Sequelize.DATEONLY,
+        type: Sequelize.DATE,
         defaultValue: new Date()
       },
       updatedAt: {
-        type: Sequelize.DATEONLY,
+        type: Sequelize.DATE,
         defaultValue: new Date()
       }
     });
