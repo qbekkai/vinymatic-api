@@ -11,13 +11,13 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      const { FormatInVinyl, FormatDescription, DecriptionInFormaVinyl } = models;
+      const { FormatInVinyl, FormatDescription, DecriptionInFormatVinyl } = models;
 
       FormatDescription.belongsToMany(FormatInVinyl, {
-        // through: DecriptionInFormaVinyl,
-        through: DecriptionInFormaVinyl, foreignKey: 'FormatDescriptionId'
-        // through: DecriptionInFormaVinyl, foreignKey: 'FormatDescriptionId', otherKey: ['FormatInVinylsVinylId', 'FormatInVinylsFormatId']
-        // through: DecriptionInFormaVinyl, foreignKey: ['FormatInVinylsVinylId', 'FormatInVinylsFormatId'], otherKey: 'FormatDescriptionId'
+        // through: DecriptionInFormatVinyl,
+        through: DecriptionInFormatVinyl, foreignKey: 'FormatDescriptionId'
+        // through: DecriptionInFormatVinyl, foreignKey: 'FormatDescriptionId', otherKey: ['FormatInVinylVinylId', 'FormatInVinylFormatId']
+        // through: DecriptionInFormatVinyl, foreignKey: ['FormatInVinylVinylId', 'FormatInVinylFormatId'], otherKey: 'FormatDescriptionId'
       })
     }
   }

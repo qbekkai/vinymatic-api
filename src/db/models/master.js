@@ -34,7 +34,7 @@ module.exports = (sequelize, DataTypes) => {
     title: DataTypes.STRING,
     description: DataTypes.TEXT,
     releaseDate: {
-      type: DataTypes.DATEONLY,
+      type: DataTypes.DATE,
       set(value) {
         this.setDataValue('releaseDate', value ? dateTool.dateFormaterStringToTimestamp(value) : null);
       }
@@ -45,11 +45,11 @@ module.exports = (sequelize, DataTypes) => {
     thumbnail: DataTypes.STRING,
     tracklist: DataTypes.JSON,
     updatedAt: {
-      type: DataTypes.DATEONLY,
+      type: DataTypes.DATE,
       defaultValue: new Date()
     },
     createdAt: {
-      type: DataTypes.DATEONLY,
+      type: DataTypes.DATE,
       defaultValue: new Date()
     }
   }, {

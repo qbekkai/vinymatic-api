@@ -29,24 +29,24 @@ module.exports = {
         type: Sequelize.STRING
       },
       images: {
-        type: Sequelize.JSONB
+        type: Sequelize.JSON
       },
       thumbnail: {
         type: Sequelize.STRING
       },
       tracklist: {
-        type: Sequelize.JSONB
+        type: Sequelize.JSON
       },
       verify: {
         type: Sequelize.BOOLEAN,
         defaultValue: false
       },
       createdAt: {
-        type: Sequelize.DATEONLY,
+        type: Sequelize.DATE,
         defaultValue: new Date()
       },
       updatedAt: {
-        type: Sequelize.DATEONLY,
+        type: Sequelize.DATE,
         defaultValue: new Date()
       }
     });

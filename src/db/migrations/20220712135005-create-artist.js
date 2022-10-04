@@ -19,19 +19,19 @@ module.exports = {
         type: Sequelize.STRING
       },
       aliasNames: {
-        type: Sequelize.JSONB
+        type: Sequelize.JSON
       },
       variantNames: {
-        type: Sequelize.JSONB
+        type: Sequelize.JSON
       },
       description: {
         type: Sequelize.TEXT
       },
       inGroups: {
-        type: Sequelize.JSONB
+        type: Sequelize.JSON
       },
       images: {
-        type: Sequelize.JSONB
+        type: Sequelize.JSON
       },
       thumbnail: {
         type: Sequelize.STRING

@@ -9,18 +9,18 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       policies: {
-        type: Sequelize.JSONB,
+        type: Sequelize.JSON,
         defaultValue: {}
       },
       UserId: {
         type: Sequelize.INTEGER
       },
       createdAt: {
-        type: Sequelize.DATEONLY,
+        type: Sequelize.DATE,
         defaultValue: new Date()
       },
       updatedAt: {
-        type: Sequelize.DATEONLY,
+        type: Sequelize.DATE,
         defaultValue: new Date()
       }
     });

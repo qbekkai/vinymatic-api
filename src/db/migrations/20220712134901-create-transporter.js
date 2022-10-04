@@ -15,14 +15,14 @@ module.exports = {
         type: Sequelize.STRING
       },
       deliveryDelay: {
-        type: Sequelize.JSONB
+        type: Sequelize.JSON
       },
       createdAt: {
-        type: Sequelize.DATEONLY,
+        type: Sequelize.DATE,
         defaultValue: new Date()
       },
       updatedAt: {
-        type: Sequelize.DATEONLY,
+        type: Sequelize.DATE,
         defaultValue: new Date()
       }
     });

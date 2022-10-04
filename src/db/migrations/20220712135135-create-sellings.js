@@ -27,7 +27,7 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       additionalImages: {
-        type: Sequelize.JSONB
+        type: Sequelize.JSON
       },
       diskCondition: {
         type: Sequelize.STRING
@@ -46,11 +46,11 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       createdAt: {
-        type: Sequelize.DATEONLY,
+        type: Sequelize.DATE,
         defaultValue: new Date()
       },
       updatedAt: {
-        type: Sequelize.DATEONLY,
+        type: Sequelize.DATE,
         defaultValue: new Date()
       }
     });
