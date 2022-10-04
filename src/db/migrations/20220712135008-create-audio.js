@@ -33,7 +33,7 @@ module.exports = {
         type: Sequelize.STRING
       },
       credits: {
-        type: Sequelize.JSONB
+        type: Sequelize.JSON
       },
       audioUrl: {
         type: Sequelize.STRING
@@ -48,7 +48,7 @@ module.exports = {
         type: Sequelize.INTEGER,
       },
       createdAt: {
-        type: Sequelize.DATEONLY,
+        type: Sequelize.DATE,
         defaultValue: new Date()
       }
     });

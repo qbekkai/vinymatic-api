@@ -11,7 +11,7 @@ module.exports = {
         allowNull: false
       },
       roleCredit: {
-        type: Sequelize.JSONB
+        type: Sequelize.JSON
       },
       typeCredit: {
         type: Sequelize.STRING

@@ -3,7 +3,7 @@ const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class DecriptionInFormaVinyl extends Model {
+  class DecriptionInFormatVinyl extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   }
-  DecriptionInFormaVinyl.init({
+  DecriptionInFormatVinyl.init({
     FormatDescriptionId: {
       type: DataTypes.INTEGER,
       references: {
@@ -21,14 +21,14 @@ module.exports = (sequelize, DataTypes) => {
         key: 'id'
       }
     },
-    FormatInVinylsVinylId: {
+    FormatInVinylVinylId: {
       type: DataTypes.INTEGER,
       references: {
         model: 'FormatInVinyls',
         key: 'VinylId'
       }
     },
-    FormatInVinylsFormatId: {
+    FormatInVinylFormatId: {
       type: DataTypes.INTEGER,
       references: {
         model: 'FormatInVinyls',
@@ -37,8 +37,8 @@ module.exports = (sequelize, DataTypes) => {
     },
   }, {
     sequelize,
-    modelName: 'DecriptionInFormaVinyl',
+    modelName: 'DecriptionInFormatVinyl',
     timestamps: false
   });
-  return DecriptionInFormaVinyl;
+  return DecriptionInFormatVinyl;
 };

@@ -19,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'LabelFollower',
-    timestamps: false,
+    updatedAt: false
   });
   return LabelFollower;
 };

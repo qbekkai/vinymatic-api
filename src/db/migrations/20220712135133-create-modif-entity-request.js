@@ -17,11 +17,11 @@ module.exports = {
         allowNull: false,
       },
       body: {
-        type: Sequelize.JSONB,
+        type: Sequelize.JSON,
         allowNull: false,
       },
       query: {
-        type: Sequelize.JSONB
+        type: Sequelize.JSON
       },
       published: {
         type: Sequelize.BOOLEAN,
@@ -31,11 +31,11 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       createdAt: {
-        type: Sequelize.DATEONLY,
+        type: Sequelize.DATE,
         defaultValue: new Date()
       },
       updatedAt: {
-        type: Sequelize.DATEONLY,
+        type: Sequelize.DATE,
         defaultValue: new Date()
       }
     });

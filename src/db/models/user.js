@@ -101,7 +101,7 @@ module.exports = (sequelize, DataTypes) => {
     lastName: DataTypes.STRING,
     showName: DataTypes.STRING,
     birthDate: {
-      type: DataTypes.DATEONLY,
+      type: DataTypes.DATE,
       set(value) {
         const ts = dateTool.dateFormaterStringToTimestamp(value);
         this.setDataValue('birthDate', ts);

@@ -6,11 +6,11 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false
       },
-      FormatInVinylsFormatId: {
+      FormatInVinylFormatId: {
         type: Sequelize.INTEGER,
         allowNull: false
       },
-      FormatInVinylsVinylId: {
+      FormatInVinylVinylId: {
         type: Sequelize.INTEGER,
         allowNull: false
       }
@@ -18,13 +18,13 @@ module.exports = {
 
     //! CONTRAINT : PK & FK
     await queryInterface.addConstraint('DecriptionInFormatVinyls', {
-      fields: ['FormatDescriptionId', 'FormatInVinylsVinylId', 'FormatInVinylsFormatId'],
+      fields: ['FormatDescriptionId', 'FormatInVinylVinylId', 'FormatInVinylFormatId'],
       type: 'primary key',
       name: 'DecriptionInFormatVinyls_FormatDescripId-VinylIdFormatId_pkey'
     });
 
     await queryInterface.addConstraint('DecriptionInFormatVinyls', {
-      fields: ['FormatDescriptionId', 'FormatInVinylsVinylId', 'FormatInVinylsFormatId'],
+      fields: ['FormatDescriptionId', 'FormatInVinylVinylId', 'FormatInVinylFormatId'],
       type: 'unique',
       name: 'DecriptionInFormatVinyls_FormatDescripId-VinylIdFormatId_unique'
     });
@@ -40,9 +40,9 @@ module.exports = {
     });
 
     await queryInterface.addConstraint('DecriptionInFormatVinyls', {
-      fields: ['FormatInVinylsVinylId', 'FormatInVinylsFormatId'],
+      fields: ['FormatInVinylVinylId', 'FormatInVinylFormatId'],
       type: 'foreign key',
-      name: 'DecriptionInFormatVinyls_FormatInVinylsVinylIdFormatId_fkey',
+      name: 'DecriptionInFormatVinyls_FormatInVinylVinylIdFormatId_fkey',
       references: {
         table: 'FormatInVinyls',
         fields: ['VinylId', 'FormatId']
@@ -51,7 +51,7 @@ module.exports = {
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.removeConstraint('DecriptionInFormatVinyls', 'DecriptionInFormatVinyls_FormatDescriptionId_fkey');
-    await queryInterface.removeConstraint('DecriptionInFormatVinyls', 'DecriptionInFormatVinyls_FormatInVinylsVinylIdFormatId_fkey');
+    await queryInterface.removeConstraint('DecriptionInFormatVinyls', 'DecriptionInFormatVinyls_FormatInVinylVinylIdFormatId_fkey');
 
     await queryInterface.dropTable('DecriptionInFormatVinyls');
   }

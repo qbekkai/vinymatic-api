@@ -14,7 +14,7 @@ module.exports = {
         type: Sequelize.FLOAT
       },
       continents: {
-        type: Sequelize.JSONB
+        type: Sequelize.JSON
       }
     });
 
