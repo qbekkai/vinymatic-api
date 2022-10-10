@@ -16,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
   LabelsInVinyl.init({
     LabelId: DataTypes.INTEGER,
     VinylId: DataTypes.INTEGER,
-    catno: DataTypes.STRING
+    catno: DataTypes.JSON
   }, {
     sequelize,
     modelName: 'LabelsInVinyl',

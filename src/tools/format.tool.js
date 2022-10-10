@@ -1,3 +1,5 @@
+const { FormatInVinyl, DecriptionInFormatVinyl, FormatDescription, FormatSide, FormatSize, FormatSpeed, FormatVoice } = require('./../db/models')
+
 module.exports = {
   addFormat: async (value, parentItem) => {
     const format = { name: value.name }
@@ -22,9 +24,17 @@ module.exports = {
 
     if (formatInVinyl.FormatDescriptions.length > 0) {
       for (const fd of formatInVinyl.FormatDescriptions) {
+        // if (fdFound) fdFound.addFormatInVinyl([[vinylFormatFound.VinylId, vinylFormatFound.FormatId]])
+
         const fdFound = await FormatDescription.findOne({ where: { name: fd } })
-        if (fdFound) fdFound.addFormatInVinyl(vinylFormatFound)
-        // if (fdFound) vinylFormatFound.addFormatDescription(fdFound)
+        const fdCreated = await DecriptionInFormatVinyl.create({
+          FormatDescriptionId: fdFound.id,
+          FormatInVinylVinylId: vinylFormatFound.VinylId,
+          FormatInVinylFormatId: vinylFormatFound.FormatId
+        })
+
+        await fdCreated.setFormatDescription(fdFound)
+        await fdCreated.setFormatInVinyl(vinylFormatFound)
       }
     }
     if (formatInVinyl.FormatSides.length > 0) {

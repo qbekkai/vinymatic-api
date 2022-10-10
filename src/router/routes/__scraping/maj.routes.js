@@ -1,131 +1,209 @@
-// const { URL_API, PORT_API, TOKEN_API } = process.env
+const Models = require('./../../../db/models')
+const imageManagmentCall = require('./../../../tools/imageManagmentCall.tool')
 
-// const { ValidationError, UniqueConstraintError } = require('sequelize')
-const { fork } = require('child_process');
-
-// const ApiService = require('../../services/apiService')
-const Models = { Artist, Vinyl, Audio } = require('./../../../db/models')
-const { haveYouThePermission } = require('../../../auth/accessControl')
-const Tools = require('../../../tools/tools')
-// const imageTools = require('../../tools/images.tool')
-const imageManagmentCall = require('../../../tools/imageManagmentCall.tool');
-const { release } = require('os');
-
-
-const getDataFromScraping = (entity, idEntity, options = {}) => {
-  return new Promise((resolve, reject) => {
-    const child = fork(`../scraping/index.js`, ['-m 1', '-r true', `-e ${entity}`, `-I ${idEntity}`,])
-    child.on('message', (msg) => {
-      switch (true) {
-        case /^\s?(?:vinyl|release|master|artist|label)::/i.test(msg):
-          const [, data] = msg.split('::')
-          resolve(JSON.parse(data))
-        //case /^\s?vinylTrack::/i.test(msg):  
-        default: reject(); break;
-      }
-    })
-    child.on('error', (error) => {
-      reject(error)
-    })
-  })
-}
+const majReleaseData = require('./../../../../datas/majRelease.data')
+const majLabelData = require('./../../../../datas/majLabel.data')
+const majMasterData = require('./../../../../datas/majMaster.data')
+const majArtistData = require('./../../../../datas/majArtist.data')
 
 module.exports = (router) => {
-  router.route('/maj/vinyls/tracks')
+  router.route('/s/maj/vinyl')
     .patch(
-      //haveYouThePermission('updateAny', 'scraping'),
       async (req, res, next) => {
         try {
-          const { query: { idEntity } } = req
-          const vinyl = await getDataFromScraping('release', idEntity)
-          const vinylFound = await Vinyl.findOne({ where: { idRelease: vinyl.idRelease } })
+          const { body: vinyl } = req
+          // const vinyl = body = majReleaseData
+          vinyl.idRelease = vinyl.idRelease && typeof vinyl.idRelease === 'string'
+            ? +(vinyl.idRelease)
+            : vinyl.idRelease
 
-          let entityObject = null
-          if (vinyl.tracklist && vinyl.tracklist.length > 0) {
-            entityObject = {
-              old: await vinylFound.getAudios(),
-              new: vinyl.tracklist
-            };
 
-            for (const eOld of entityObject.old) {
-              await vinylFound.removeAudio(eOld)
-              await Audio.destroy({ where: { id: eOld.id } })
-            }
-
-            for (const track of entityObject.new) {
-              track.image = vinylFound.thumbnail
-              const audioCreated = await vinylFound.createAudio(track)
-
-              /** Main Artist */
-              for (const a of track.artists) {
-                const artistFound = await Artist.findOne({ where: { idArtist: a.idArtist } })
-                if (artistFound !== null) artistFound.addAudioMainArtist(audioCreated)
-              }
-
-              /** Credit */
-              if (track.credits && Array.isArray(track.credits)) {
-                for (const c of track.credits) {
-                  const artistFound = await Artist.findOne({ where: { idArtist: c.creditArtistId } })
-                  if (artistFound !== null) await artistFound.addAudioCredit(audioCreated, { through: { roleCredit: c.creditRole, typeCredit: 'AUDIO_CREDIT' } })
-                  else await audioCreated.createAudioCredit({ idArtist: c.creditArtistId }, { through: { roleCredit: c.creditRole, typeCredit: 'AUDIO_CREDIT' } })
-                }
-              }
-            }
-            console.log(`Tracks Changed !!`)
-          }
-
-          const options = {
-            attributes: [],
-            include: [
-              {
-                model: Audio,
-                attributes: ["id", "position", "title", "mainTitle", "subTitle", "type", "image", "duration", "audioUrl", "resourceUrl"],
-                include: [
-                  { model: Artist, as: "AudioMainArtists", attributes: ["id", "name", "artistUrl", "resourceUrl"] },
-                  { model: Artist, as: "AudioCredits", attributes: ["id", "name", "artistUrl", "resourceUrl"] }
-                ]
-              }
-            ],
-            where: { idRelease: idEntity },
-            rejectOnEmpty: true
-          }
-          const itemFound = await Vinyl.findOne(options)
-
-          req.results = { tracklist: itemFound.Audios }
-          console.log(`-----------------------`)
-
-          next()
-          // res.status(200).json({ vinyl: itemFound })
-        } catch (error) {
-          res.status(500).json(error)
-        }
-      })
-
-  router.route('/maj/:entity/images')
-    .patch(
-      haveYouThePermission('updateAny', 'scraping'),
-      async (req, res, next) => {
-        try {
-          const { params: { entity: entitySelect }, query: { idEntity } } = req
-          const entity = await getDataFromScraping(entitySelect, idEntity)
-          const dbItem = await Models[Tools.capitelize(/release/i.test(entitySelect) ? 'vinyl' : entitySelect)].findOne({ where: { idRelease: entity.idRelease } })
-
-          /** IMAGES */
-          const allImages = await imageManagmentCall(null, entity, {
-            dbItem,
-            imageFrom: /release/i.test(entitySelect) ? 'vinyl' : entitySelect
+          let vinylFound = await Models.Vinyl.findOne({ where: { idRelease: vinyl.idRelease }, rejectOnEmpty: true })
+          await vinylFound.update({
+            title: vinyl.title,
+            country: vinyl.country,
+            releaseDate: vinyl.releaseDate,
           })
-          /** IMAGES */
 
-          await dbItem.update(allImages)
-          const itemFound = await Vinyl.findByPk(dbItem.id, { attributes: { exclude: ["serie"] }, rejectOnEmpty: true });
 
-          res.status(200).json({ vinyl: itemFound })
-        } catch (error) {
-          res.status(500).json(error)
+          let entityObject = {};
+          for (const [key, values] of Object.entries(vinyl)) {
+            switch (true) {
+              case (values && /identifiers/i.test(key) && values.length !== 0):
+                entityObject = {
+                  old: await vinylFound.getIdentifiers(),
+                  new: vinyl.identifiers
+                };
+
+                for (const eOld of entityObject.old) await vinylFound.removeIdentifier(eOld)
+                for (const eNew of entityObject.new) {
+                  const toUpdate = await Models.Identifier.findOne({ where: eNew });
+                  if (toUpdate !== null) await vinylFound.addIdentifier(toUpdate)
+                  else await vinylFound.createIdentifier(eNew)
+                }
+
+                console.log(`     IDENTIFIERS UPDATED !!`)
+                break;
+              case (values && /tracklist/i.test(key) && values.length !== 0):
+                entityObject = {
+                  old: await vinylFound.getAudios(),
+                  new: vinyl.tracklist
+                };
+
+                for (const eOld of entityObject.old) {
+                  await vinylFound.removeAudio(eOld)
+                  await Audio.destroy({ where: { id: eOld.id } })
+                }
+
+                for (const track of entityObject.new) {
+                  const audioCreated = await vinylFound.createAudio(track)
+
+                  /** Main Artist */
+                  for (const a of track.artists) {
+                    const artistFound = await Artist.findOne({ where: { idArtist: a.idArtist } })
+                    if (artistFound !== null) artistFound.addAudioMainArtist(audioCreated)
+                  }
+
+                  /** Credit */
+                  if (track.credits && Array.isArray(track.credits)) {
+                    for (const c of track.credits) {
+                      let artistFound = null
+                      if (c.creditArtistId) artistFound = await Artist.findOne({ where: { idArtist: c.creditArtistId } })
+                      else artistFound = await Artist.findOne({ where: { name: c.creditArtistName } })
+
+                      if (artistFound !== null) await artistFound.addAudioCredit(audioCreated, { through: { roleCredit: c.creditRole, typeCredit: 'AUDIO_CREDIT' } })
+                      else await audioCreated.createAudioCredit({ idArtist: c.creditArtistId ? c.creditArtistId : null }, { through: { roleCredit: c.creditRole, typeCredit: 'AUDIO_CREDIT' } })
+                    }
+                  }
+                }
+
+                console.log(`     TRACKS UPDATED !!`)
+                break;
+            }
+          }
+
+          vinylFound = await Models.Vinyl.findByPk(vinylFound.id)
+          console.log(`VINYL UPDATED BY SCRAPING !! ( idRelease: ${vinylFound.idRelease})`)
+          console.log(`------------------------------`)
+
+
+          res.status(200).json({ vinyl: vinylFound })
+        } catch (err) {
+          if (/SequelizeUniqueConstraintError/i.test(err.name))
+            return res.status(400).json({ message: `Vinyl (idRelease: ${err.fields.idRelease}) already exist` })
+
+          res.status(500).json({ message: 'InternalError' })
         }
-
       })
+
+  router.route('/s/maj/label')
+    .patch(async (req, res, next) => {
+      try {
+        const { body: label } = req
+        // const label = body = majLabelData
+        label.idLabel = label.idLabel && typeof label.idLabel === 'string'
+          ? +(label.idLabel)
+          : label.idLabel
+
+
+        let labelFound = await Models.Label.findOne({ where: { idLabel: label.idLabel }, rejectOnEmpty: true })
+
+        // Images
+        // const allImages = await imageManagmentCall(null, label, {
+        //   dbItem: labelFound,
+        //   imageFrom: 'label'
+        // })
+
+        await labelFound.update({
+          name: label.name,
+          thumbnail: null,
+          images: null
+          // thumbnail: allImages.thumbnail,
+          // images: allImages.images
+        })
+
+
+        labelFound = await Models.Label.findByPk(labelFound.id)
+        console.log(`LABEL UPDATED BY SCRAPING !! ( idLabel: ${labelFound.idLabel})`)
+        console.log(`------------------------------`)
+
+
+        res.status(200).json({ label: labelFound })
+      } catch (err) {
+        if (/SequelizeUniqueConstraintError/i.test(err.name))
+          return res.status(400).json({ message: `Label (idLabel: ${err.fields.idLabel}) already exist` })
+
+        res.status(500).json({ message: 'InternalError' })
+      }
+    })
+
+  router.route('/s/maj/artist')
+    .patch(async (req, res, next) => {
+      try {
+        const { body: artist } = req
+        // const artist = body = majArtistData
+        artist.idArtist = artist.idArtist && typeof artist.idArtist === 'string'
+          ? +(artist.idArtist)
+          : artist.idArtist
+
+        let artistFound = await Models.Artist.findOne({ where: { idArtist: artist.idArtist }, rejectOnEmpty: true })
+        await artistFound.update({
+          name: artist.name,
+          fullName: artist.fullName,
+          description: artist.description,
+          aliasNames: artist.aliasNames,
+          inGroups: artist.inGroups,
+          variantNames: artist.variantNames
+        })
+
+        artistFound = await Models.Artist.findByPk(artistFound.id)
+        console.log(`ARTIST UPDATED BY SCRAPING !! ( idArtist: ${artistFound.idArtist} )`)
+        console.log(`------------------------------`)
+
+
+        res.status(200).json({ artist: artistFound })
+      } catch (err) {
+        if (/SequelizeUniqueConstraintError/i.test(err.name))
+          return res.status(400).json({ message: `Artist (idArtist: ${err.fields.idRelease}) already exist` })
+
+        res.status(500).json({ message: 'InternalError' })
+      }
+    })
+
+
+
+  // TODO ------------------------------------
+  router.route('/s/maj/master')
+    .patch(
+      async (req, res, next) => {
+        try {
+          const { body: master } = req
+          // const master = body = majMasterData
+          master.idMaster = master.idMaster && typeof master.idMaster === 'string'
+            ? +(master.idMaster)
+            : master.idMaster
+
+          let masterFound = await Models.Master.findOne({ where: { idMaster: master.idMaster }, rejectOnEmpty: true })
+          await masterFound.update({
+            title: master.title,
+            // description: master.description,
+            releaseDate: master.releaseDate,
+            tracklist: master.tracklists
+          })
+
+          masterFound = await Models.Master.findByPk(masterFound.id)
+          console.log(`MASTER UPDATED BY SCRAPING !! ( idMaster: ${masterFound.idMaster} )`)
+          console.log(`------------------------------`)
+
+
+          res.status(200).json({ master: masterFound })
+        } catch (err) {
+          if (/SequelizeUniqueConstraintError/i.test(err.name))
+            return res.status(400).json({ message: `Master (idMaster: ${err.fields.idMaster}) already exist` })
+
+          res.status(500).json({ message: 'InternalError' })
+        }
+      })
+
 
 }
-

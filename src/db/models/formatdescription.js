@@ -19,6 +19,7 @@ module.exports = (sequelize, DataTypes) => {
         // through: DecriptionInFormatVinyl, foreignKey: 'FormatDescriptionId', otherKey: ['FormatInVinylVinylId', 'FormatInVinylFormatId']
         // through: DecriptionInFormatVinyl, foreignKey: ['FormatInVinylVinylId', 'FormatInVinylFormatId'], otherKey: 'FormatDescriptionId'
       })
+      FormatDescription.hasMany(DecriptionInFormatVinyl)
     }
   }
   FormatDescription.init({
