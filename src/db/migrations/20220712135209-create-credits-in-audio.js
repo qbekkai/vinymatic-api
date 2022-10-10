@@ -43,7 +43,8 @@ module.exports = {
       references: {
         table: 'Audios',
         field: 'id'
-      }
+      },
+      onDelete: 'cascade',
     });
   },
   async down(queryInterface, Sequelize) {

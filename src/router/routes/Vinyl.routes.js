@@ -50,7 +50,7 @@ module.exports = (router) => {
             // raw: true
           }
           options = Tools.nPagination(query, options);
-          options = filters.byVerified(url, query, options)
+          // options = filters.byVerified(url, query, options)
           options = getFilterOptions(url, query, options)
 
           // if (query.formatSize) options = filters.byFormatSize(query.formatSize, options)
