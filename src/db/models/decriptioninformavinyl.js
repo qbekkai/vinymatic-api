@@ -11,6 +11,10 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      const { FormatInVinyl, FormatDescription, DecriptionInFormatVinyl } = models;
+
+      DecriptionInFormatVinyl.belongsTo(FormatDescription)
+      DecriptionInFormatVinyl.belongsTo(FormatInVinyl)
     }
   }
   DecriptionInFormatVinyl.init({

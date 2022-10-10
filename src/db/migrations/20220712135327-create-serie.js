@@ -11,7 +11,7 @@ module.exports = {
         allowNull: false
       },
       catno: {
-        type: Sequelize.STRING
+        type: Sequelize.JSON
       }
     });
 

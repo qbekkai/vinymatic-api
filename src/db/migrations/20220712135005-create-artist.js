@@ -39,7 +39,7 @@ module.exports = {
       artistUrl: {
         type: Sequelize.STRING
       },
-      resourceUr: {
+      resourceUrl: {
         type: Sequelize.STRING
       },
       verify: {
