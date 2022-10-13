@@ -928,9 +928,11 @@ module.exports = (router) => {
 
           let newUrls = [file]
           let vinylFound = await Vinyl.findByPk(id, { attributes: { exclude: ["serie"] }, rejectOnEmpty: true });
-          let dbVinylImage = vinylFound.images.map(el => el.replace(/^\/images?\/(.+)$/, `$1`))
+          let dbVinylImage = vinylFound.images
+            ? vinylFound.images.map(el => el.replace(/^\/images?\/(.+)$/, `$1`))
+            : []
 
-          if (position > vinylFound.images.length + 1)
+          if (Array.isArray(vinylFound.images) && position > vinylFound.images.length + 1)
             throw { name: 'VinymaticApiPositionNotExist' }
 
           /** IMAGES */
