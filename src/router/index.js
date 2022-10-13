@@ -27,7 +27,7 @@ require('./routes/Own/Follow.routes')(router)
 require('./routes/Own/Playlist.routes')(router)
 require('./routes/Own/Selling.routes')(router)
 require('./routes/Own/User.routes')(router)
-require('./routes/Own/Wishlist.routes'); (router)
+require('./routes/Own/Wishlist.routes')(router)
 require('./routes/Own/Transporter.routes')(router)
 
 // require('./routes/documentation.routes')(router)
