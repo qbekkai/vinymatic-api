@@ -1,6 +1,7 @@
 .env*
 uploads
 download
+datas/
 
 # Logs
 logs

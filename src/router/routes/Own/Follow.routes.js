@@ -1,4 +1,5 @@
 const { Label, User, sequelize } = require('./../../../db/models')
+const { ValidationError, UniqueConstraintError } = require('sequelize')
 const ErrorMessage = require('../../../error/messages')
 const { EMPTY_ERROR, REFERENCE_ERROR, MALFORMED_TOKEN_ERROR, EXPIRED_TOKEN_ERROR, IS_LOGIN_ERROR, ALREADY_USED_CODE_ERROR, INVALID_CODE_ERROR, EXPIRED_CODE_ERROR, NO_EMAIL_NO_PHONENUMBER_ERROR, USER_INVALID_PASSWORD_ERROR, NO_USER_ERROR, NO_CRITRIA_ERROR, ALREADY_EXIST_ERROR, NOT_EXIST_ERROR, NO_MODIFICATION_ERROR, NO_ENTITY_SELECTED_ERROR, ANONYMOUS_USER_ERROR } = require('../../../error/constError')
 const { haveYouThePermission } = require('../../../auth/accessControl')
@@ -112,7 +113,7 @@ module.exports = (router) => {
       async (req, res, next) => {
         try {
           const { query, user } = req
-          const { toFollow: id, isArtist } = query
+          const { toFollow: id, isArtist, isLabel } = query
           const { username } = user
 
           const _selfUser = await User.findOne({ attributes: ["id"], where: { username }, rejectOnEmpty: true })
@@ -145,7 +146,7 @@ module.exports = (router) => {
       async (req, res, next) => {
         try {
           const { query, user } = req
-          const { userToUnfollow: id, isArtist } = query
+          const { userToUnfollow: id, isArtist, isLabel } = query
           const { username } = user
 
           const _selfUser = await User.findOne({ attributes: ["id"], where: { username }, rejectOnEmpty: true })
