@@ -112,7 +112,7 @@ module.exports = (router) => {
       async (req, res, next) => {
         try {
           const { query, user } = req
-          const { toFollow: id, isArtist } = query
+          const { toFollow: id, isArtist, isLabel } = query
           const { username } = user
 
           const _selfUser = await User.findOne({ attributes: ["id"], where: { username }, rejectOnEmpty: true })
@@ -145,7 +145,7 @@ module.exports = (router) => {
       async (req, res, next) => {
         try {
           const { query, user } = req
-          const { userToUnfollow: id, isArtist } = query
+          const { userToUnfollow: id, isArtist, isLabel } = query
           const { username } = user
 
           const _selfUser = await User.findOne({ attributes: ["id"], where: { username }, rejectOnEmpty: true })
