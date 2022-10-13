@@ -1,6 +1,5 @@
 const Models = require('./../../../db/models')
 
-const scanData = require('./../../../../datas/scan.data')
 const { addFormat } = require('./../../../tools/format.tool')
 
 module.exports = (router) => {
@@ -9,7 +8,6 @@ module.exports = (router) => {
       async (req, res, next) => {
         try {
           const { body: vinyl } = req
-          // const vinyl = body = scanData
           vinyl.idRelease = vinyl.idRelease && typeof vinyl.idRelease === 'string'
             ? +(vinyl.idRelease)
             : vinyl.idRelease

@@ -28,10 +28,10 @@ module.exports = (router) => {
       async (req, res, next) => {
         try {
           const { query } = req;
-          let { isForScrapingMaj, isErreurScraping } = query;
+          // let { isForScrapingMaj, isErreurScraping } = query;
 
-          isErreurScraping = isErreurScraping == 'true' ? true : false
-          isForScrapingMaj = isForScrapingMaj == 'true' ? true : false
+          // isErreurScraping = isErreurScraping == 'true' ? true : false
+          // isForScrapingMaj = isForScrapingMaj == 'true' ? true : false
 
 
           // const pagination = Tools.pagination(query);
@@ -48,56 +48,57 @@ module.exports = (router) => {
           // };
 
           let where = {}
-          if (isForScrapingMaj) {
-            where = {
-              [Op.and]: [
-                { idArtist: { [Op.not]: null } },
-                {
-                  thumbnail: {
-                    [Op.or]: [
-                      { [Op.is]: null },
-                      { [Op.substring]: '%discogs%' }
-                    ]
-                  }
-                },
-                {
-                  images: {
-                    [Op.or]: [
-                      { [Op.is]: null },
-                      { [Op.substring]: '%discogs%' }
-                    ]
-                  }
-                },
-              ]
-            }
+          // if (isForScrapingMaj) {
+          //   where = {
+          //     [Op.and]: [
+          //       { idArtist: { [Op.not]: null } },
+          //       {
+          //         thumbnail: {
+          //           [Op.or]: [
+          //             { [Op.is]: null },
+          //             { [Op.substring]: '%discogs%' }
+          //           ]
+          //         }
+          //       },
+          //       {
+          //         images: {
+          //           [Op.or]: [
+          //             { [Op.is]: null },
+          //             { [Op.substring]: '%discogs%' }
+          //           ]
+          //         }
+          //       },
+          //     ]
+          //   }
 
-          } else if (isErreurScraping) {
-            where = {
-              [Op.and]: [{ idArtist: { [Op.is]: null } }]
-            }
-          } else {
-            where = {
-              [Op.and]: [
-                { idArtist: { [Op.not]: null } },
-                {
-                  thumbnail: {
-                    [Op.and]: [
-                      { [Op.not]: null },
-                      { [Op.notLike]: '%discogs%' }
-                    ]
-                  }
-                },
-                {
-                  images: {
-                    [Op.and]: [
-                      { [Op.not]: null },
-                      { [Op.notLike]: '%discogs%' }
-                    ]
-                  }
-                },
-              ]
-            }
-          }
+          // } else if (isErreurScraping) {
+          //   where = {
+          //     [Op.and]: [{ idArtist: { [Op.is]: null } }]
+          //   }
+          // } else {
+          //   where = {
+          //     [Op.and]: [
+          //       { idArtist: { [Op.not]: null } },
+          //       {
+          //         thumbnail: {
+          //           [Op.and]: [
+          //             { [Op.not]: null },
+          //             { [Op.notLike]: '%discogs%' }
+          //           ]
+          //         }
+          //       },
+          //       {
+          //         images: {
+          //           [Op.and]: [
+          //             { [Op.not]: null },
+          //             { [Op.notLike]: '%discogs%' }
+          //           ]
+          //         }
+          //       },
+          //     ]
+          //   }
+          // }
+
           const filter = Tools.filter(query, { entity: 'artist' });
           const paginations = Tools.pagination(query);
           const includes = {
@@ -113,10 +114,6 @@ module.exports = (router) => {
           }
 
           options.where = { ...where, ...options.where }
-
-
-
-
 
           const artists = await Artist.findAll(options)
           res.status(200).json({ artists })
