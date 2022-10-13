@@ -24,9 +24,8 @@ module.exports = (router) => {
         try {
           const { query } = req;
           let { getIdMaster, isNoLimitPagination, isForScrapingMaj, isErreurScraping } = query;
-          isErreurScraping = isErreurScraping == 'true' ? true : false
-          isForScrapingMaj = isForScrapingMaj == 'true' ? true : false
-
+          // isErreurScraping = isErreurScraping == 'true' ? true : false
+          // isForScrapingMaj = isForScrapingMaj == 'true' ? true : false
 
           // const paginations = Tools.pagination(query);
           // const filter = Tools.filter(query);
@@ -43,56 +42,56 @@ module.exports = (router) => {
           // };
 
           let where = {}
-          if (isForScrapingMaj) {
-            where = {
-              [Op.and]: [
-                { idMaster: { [Op.not]: null } },
-                {
-                  thumbnail: {
-                    [Op.or]: [
-                      { [Op.is]: null },
-                      { [Op.substring]: '%discogs%' }
-                    ]
-                  }
-                },
-                {
-                  images: {
-                    [Op.or]: [
-                      { [Op.is]: null },
-                      { [Op.substring]: '%discogs%' }
-                    ]
-                  }
-                },
-              ]
-            }
+          // if (isForScrapingMaj) {
+          //   where = {
+          //     [Op.and]: [
+          //       { idMaster: { [Op.not]: null } },
+          //       {
+          //         thumbnail: {
+          //           [Op.or]: [
+          //             { [Op.is]: null },
+          //             { [Op.substring]: '%discogs%' }
+          //           ]
+          //         }
+          //       },
+          //       {
+          //         images: {
+          //           [Op.or]: [
+          //             { [Op.is]: null },
+          //             { [Op.substring]: '%discogs%' }
+          //           ]
+          //         }
+          //       },
+          //     ]
+          //   }
 
-          } else if (isErreurScraping) {
-            where = {
-              [Op.and]: [{ idMaster: { [Op.is]: null } }]
-            }
-          } else {
-            where = {
-              [Op.and]: [
-                { idMaster: { [Op.not]: null } },
-                {
-                  thumbnail: {
-                    [Op.and]: [
-                      { [Op.not]: null },
-                      { [Op.notLike]: '%discogs%' }
-                    ]
-                  }
-                },
-                {
-                  images: {
-                    [Op.and]: [
-                      { [Op.not]: null },
-                      { [Op.notLike]: '%discogs%' }
-                    ]
-                  }
-                },
-              ]
-            }
-          }
+          // } else if (isErreurScraping) {
+          //   where = {
+          //     [Op.and]: [{ idMaster: { [Op.is]: null } }]
+          //   }
+          // } else {
+          //   where = {
+          //     [Op.and]: [
+          //       { idMaster: { [Op.not]: null } },
+          //       {
+          //         thumbnail: {
+          //           [Op.and]: [
+          //             { [Op.not]: null },
+          //             { [Op.notLike]: '%discogs%' }
+          //           ]
+          //         }
+          //       },
+          //       {
+          //         images: {
+          //           [Op.and]: [
+          //             { [Op.not]: null },
+          //             { [Op.notLike]: '%discogs%' }
+          //           ]
+          //         }
+          //       },
+          //     ]
+          //   }
+          // }
 
           const paginations = Tools.pagination(query);
           const options = {

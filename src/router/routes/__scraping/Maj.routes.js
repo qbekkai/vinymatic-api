@@ -1,10 +1,4 @@
-const Models = require('./../../../db/models')
-const imageManagmentCall = require('./../../../tools/imageManagmentCall.tool')
-
-const majReleaseData = require('./../../../../datas/majRelease.data')
-const majLabelData = require('./../../../../datas/majLabel.data')
-const majMasterData = require('./../../../../datas/majMaster.data')
-const majArtistData = require('./../../../../datas/majArtist.data')
+const Models = require('../../../db/models')
 
 module.exports = (router) => {
   router.route('/s/maj/vinyl')
@@ -12,7 +6,6 @@ module.exports = (router) => {
       async (req, res, next) => {
         try {
           const { body: vinyl } = req
-          // const vinyl = body = majReleaseData
           vinyl.idRelease = vinyl.idRelease && typeof vinyl.idRelease === 'string'
             ? +(vinyl.idRelease)
             : vinyl.idRelease
@@ -100,7 +93,6 @@ module.exports = (router) => {
     .patch(async (req, res, next) => {
       try {
         const { body: label } = req
-        // const label = body = majLabelData
         label.idLabel = label.idLabel && typeof label.idLabel === 'string'
           ? +(label.idLabel)
           : label.idLabel
@@ -141,7 +133,6 @@ module.exports = (router) => {
     .patch(async (req, res, next) => {
       try {
         const { body: artist } = req
-        // const artist = body = majArtistData
         artist.idArtist = artist.idArtist && typeof artist.idArtist === 'string'
           ? +(artist.idArtist)
           : artist.idArtist
@@ -178,7 +169,6 @@ module.exports = (router) => {
       async (req, res, next) => {
         try {
           const { body: master } = req
-          // const master = body = majMasterData
           master.idMaster = master.idMaster && typeof master.idMaster === 'string'
             ? +(master.idMaster)
             : master.idMaster
