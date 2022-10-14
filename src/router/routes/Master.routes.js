@@ -53,7 +53,14 @@ module.exports = (router) => {
             }
             : {
               [Op.and]: [
-                { idMaster: { [Op.is]: null } },
+                {
+                  idMaster: {
+                    [Op.or]: [
+                      { [Op.is]: null },
+                      { [Op.not]: null }
+                    ]
+                  }
+                },
                 { title: { [Op.is]: null } },
               ]
             }

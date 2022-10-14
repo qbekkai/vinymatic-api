@@ -91,7 +91,14 @@ module.exports = (router) => {
             }
             : {
               [Op.and]: [
-                { idRelease: { [Op.is]: null } },
+                {
+                  idRelease: {
+                    [Op.or]: [
+                      { [Op.is]: null },
+                      { [Op.not]: null }
+                    ]
+                  }
+                },
                 { title: { [Op.is]: null } },
               ]
             }
