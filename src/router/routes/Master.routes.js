@@ -23,7 +23,7 @@ module.exports = (router) => {
       async (req, res, next) => {
         try {
           const { query } = req;
-          let { getIdMaster, isNoLimitPagination, isForScrapingMaj, isErreurScraping } = query;
+          let { getIdMaster, isNoLimitPagination, isErreurScraping } = query;
           // isErreurScraping = isErreurScraping == 'true' ? true : false
           // isForScrapingMaj = isForScrapingMaj == 'true' ? true : false
 
@@ -41,57 +41,23 @@ module.exports = (router) => {
           //   ...filter
           // };
 
-          let where = {}
-          // if (isForScrapingMaj) {
-          //   where = {
-          //     [Op.and]: [
-          //       { idMaster: { [Op.not]: null } },
-          //       {
-          //         thumbnail: {
-          //           [Op.or]: [
-          //             { [Op.is]: null },
-          //             { [Op.substring]: '%discogs%' }
-          //           ]
-          //         }
-          //       },
-          //       {
-          //         images: {
-          //           [Op.or]: [
-          //             { [Op.is]: null },
-          //             { [Op.substring]: '%discogs%' }
-          //           ]
-          //         }
-          //       },
-          //     ]
-          //   }
+          let { isForScrapingMaj } = query;
+          isForScrapingMaj = isForScrapingMaj == 'true' ? true : false
 
-          // } else if (isErreurScraping) {
-          //   where = {
-          //     [Op.and]: [{ idMaster: { [Op.is]: null } }]
-          //   }
-          // } else {
-          //   where = {
-          //     [Op.and]: [
-          //       { idMaster: { [Op.not]: null } },
-          //       {
-          //         thumbnail: {
-          //           [Op.and]: [
-          //             { [Op.not]: null },
-          //             { [Op.notLike]: '%discogs%' }
-          //           ]
-          //         }
-          //       },
-          //       {
-          //         images: {
-          //           [Op.and]: [
-          //             { [Op.not]: null },
-          //             { [Op.notLike]: '%discogs%' }
-          //           ]
-          //         }
-          //       },
-          //     ]
-          //   }
-          // }
+          let where = !isForScrapingMaj
+            ? {
+              [Op.and]: [
+                { idMaster: { [Op.not]: null } },
+                { title: { [Op.not]: null } },
+              ]
+            }
+            : {
+              [Op.and]: [
+                { idMaster: { [Op.is]: null } },
+                { title: { [Op.is]: null } },
+              ]
+            }
+
 
           const paginations = Tools.pagination(query);
           const options = {
