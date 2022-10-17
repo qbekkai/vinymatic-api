@@ -16,6 +16,8 @@ module.exports = (router) => {
             title: vinyl.title,
             country: vinyl.country,
             releaseDate: vinyl.releaseDate,
+            thumbnail: "",
+            images: []
           })
 
 
@@ -100,18 +102,12 @@ module.exports = (router) => {
 
         let labelFound = await Models.Label.findOne({ where: { idLabel: label.idLabel }, rejectOnEmpty: true })
 
-        // Images
-        // const allImages = await imageManagmentCall(null, label, {
-        //   dbItem: labelFound,
-        //   imageFrom: 'label'
-        // })
-
         await labelFound.update({
           name: label.name,
           thumbnail: null,
-          images: null
-          // thumbnail: allImages.thumbnail,
-          // images: allImages.images
+          images: null,
+          thumbnail: "",
+          images: []
         })
 
 
@@ -144,7 +140,9 @@ module.exports = (router) => {
           description: artist.description,
           aliasNames: artist.aliasNames,
           inGroups: artist.inGroups,
-          variantNames: artist.variantNames
+          variantNames: artist.variantNames,
+          thumbnail: "",
+          images: []
         })
 
         artistFound = await Models.Artist.findByPk(artistFound.id)
@@ -178,7 +176,9 @@ module.exports = (router) => {
             title: master.title,
             // description: master.description,
             releaseDate: master.releaseDate,
-            tracklist: master.tracklists
+            tracklist: master.tracklists,
+            thumbnail: "",
+            images: []
           })
 
           masterFound = await Models.Master.findByPk(masterFound.id)
