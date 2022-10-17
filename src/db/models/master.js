@@ -41,8 +41,14 @@ module.exports = (sequelize, DataTypes) => {
     },
     masterUrl: DataTypes.STRING,
     resourceUrl: DataTypes.STRING,
-    images: DataTypes.JSON,
-    thumbnail: DataTypes.STRING,
+    images: {
+      type: DataTypes.JSON,
+      defaultValue: []
+    },
+    thumbnail: {
+      type: DataTypes.STRING,
+      defaultValue: ''
+    },
     tracklist: DataTypes.JSON,
     updatedAt: {
       type: DataTypes.DATE,

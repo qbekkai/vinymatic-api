@@ -44,57 +44,30 @@ module.exports = (router) => {
           // };
 
 
-          let where = {}
-          // if (isForScrapingMaj) {
-          //   where = {
-          //     [Op.and]: [
-          //       { idLabel: { [Op.not]: null } },
-          //       {
-          //         thumbnail: {
-          //           [Op.or]: [
-          //             { [Op.is]: null },
-          //             { [Op.substring]: '%discogs%' }
-          //           ]
-          //         }
-          //       },
-          //       {
-          //         images: {
-          //           [Op.or]: [
-          //             { [Op.is]: null },
-          //             { [Op.substring]: '%discogs%' }
-          //           ]
-          //         }
-          //       },
-          //     ]
-          //   }
+          let { isForScrapingMaj } = query;
+          isForScrapingMaj = isForScrapingMaj == 'true' ? true : false
 
-          // } else if (isErreurScraping) {
-          //   where = {
-          //     [Op.and]: [{ idLabel: { [Op.is]: null } }]
-          //   }
-          // } else {
-          //   where = {
-          //     [Op.and]: [
-          //       { idLabel: { [Op.not]: null } },
-          //       {
-          //         thumbnail: {
-          //           [Op.and]: [
-          //             { [Op.not]: null },
-          //             { [Op.notLike]: '%discogs%' }
-          //           ]
-          //         }
-          //       },
-          //       {
-          //         images: {
-          //           [Op.and]: [
-          //             { [Op.not]: null },
-          //             { [Op.notLike]: '%discogs%' }
-          //           ]
-          //         }
-          //       },
-          //     ]
-          //   }
-          // }
+          let where = !isForScrapingMaj
+            ? {
+              [Op.and]: [
+                { idLabel: { [Op.not]: null } },
+                { name: { [Op.not]: null } },
+              ]
+            }
+            : {
+              [Op.and]: [
+                {
+                  idLabel: {
+                    [Op.or]: [
+                      { [Op.is]: null },
+                      { [Op.not]: null }
+                    ]
+                  }
+                },
+                { name: { [Op.is]: null } },
+              ]
+            }
+
 
           const paginations = Tools.pagination(query);
           const options = {

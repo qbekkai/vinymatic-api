@@ -29,6 +29,7 @@ module.exports = (router) => {
         try {
           const { query } = req;
           // let { isForScrapingMaj, isErreurScraping } = query;
+          // let { isForScrapingMaj, isErreurScraping } = query;
 
           // isErreurScraping = isErreurScraping == 'true' ? true : false
           // isForScrapingMaj = isForScrapingMaj == 'true' ? true : false
@@ -47,57 +48,31 @@ module.exports = (router) => {
           //   ...filter
           // };
 
-          let where = {}
-          // if (isForScrapingMaj) {
-          //   where = {
-          //     [Op.and]: [
-          //       { idArtist: { [Op.not]: null } },
-          //       {
-          //         thumbnail: {
-          //           [Op.or]: [
-          //             { [Op.is]: null },
-          //             { [Op.substring]: '%discogs%' }
-          //           ]
-          //         }
-          //       },
-          //       {
-          //         images: {
-          //           [Op.or]: [
-          //             { [Op.is]: null },
-          //             { [Op.substring]: '%discogs%' }
-          //           ]
-          //         }
-          //       },
-          //     ]
-          //   }
 
-          // } else if (isErreurScraping) {
-          //   where = {
-          //     [Op.and]: [{ idArtist: { [Op.is]: null } }]
-          //   }
-          // } else {
-          //   where = {
-          //     [Op.and]: [
-          //       { idArtist: { [Op.not]: null } },
-          //       {
-          //         thumbnail: {
-          //           [Op.and]: [
-          //             { [Op.not]: null },
-          //             { [Op.notLike]: '%discogs%' }
-          //           ]
-          //         }
-          //       },
-          //       {
-          //         images: {
-          //           [Op.and]: [
-          //             { [Op.not]: null },
-          //             { [Op.notLike]: '%discogs%' }
-          //           ]
-          //         }
-          //       },
-          //     ]
-          //   }
-          // }
+
+          let { isForScrapingMaj } = query;
+          isForScrapingMaj = isForScrapingMaj == 'true' ? true : false
+
+          let where = !isForScrapingMaj
+            ? {
+              [Op.and]: [
+                { idArtist: { [Op.not]: null } },
+                { name: { [Op.not]: null } },
+              ]
+            }
+            : {
+              [Op.and]: [
+                {
+                  idArtist: {
+                    [Op.or]: [
+                      { [Op.is]: null },
+                      { [Op.not]: null }
+                    ]
+                  }
+                },
+                { name: { [Op.is]: null } },
+              ]
+            }
 
           const filter = Tools.filter(query, { entity: 'artist' });
           const paginations = Tools.pagination(query);
