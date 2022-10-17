@@ -28,7 +28,7 @@ module.exports = (router) => {
               : `${name}_${id_}I${Date.now()}D.jpg`;
           }
 
-          const path = `${imageFrom}/${typeImage}/${filename}`
+          const path = encodeURI(`${imageFrom}/${typeImage}/${filename}`)
 
           const bucketS3Service = new BucketS3Service('image')
           const uploadResult = await bucketS3Service.uploadFile(path, file)
@@ -58,7 +58,7 @@ module.exports = (router) => {
 
           let filename = `${titleAudio}_${idAudio}I${Date.now()}D${positionAudio}P.mp3`
 
-          const path = `${typeAudio}/${filename}`
+          const path = encodeURI(`${typeAudio}/${filename}`)
 
           const bucketS3Service = new BucketS3Service('audio')
           const uploadResult = await bucketS3Service.uploadFile(path, file)
@@ -89,7 +89,7 @@ module.exports = (router) => {
 
           let filename = `${title}_${idVideo}I${Date.now()}D.mp4`
 
-          const path = `${typeVideo}/${filename}`
+          const path = encodeURI(`${typeVideo}/${filename}`)
 
           const bucketS3Service = new BucketS3Service('video')
           const uploadResult = await bucketS3Service.uploadFile(path, file)

@@ -12,47 +12,6 @@ securityDefinitions: {}
 consumes: []
 produces: []
 paths:
-  "/maj/vinyls/tracks":
-    patch:
-      tags:
-        - __Scraping
-      description: "Scrap les tracks et les met à jour."
-      parameters:
-        - name: idEntity
-          description: "Correspond à ___idRelease___ et non à ___id___."
-          in: query
-          required: true
-          schema:
-            type: integer
-      responses:
-        "200":
-          description: Updated
-        "500":
-          description: Internal Server Error
-  "/maj/{entity}/images":
-    patch:
-      tags:
-        - __Scraping
-      description: "Scrap les images et les met à jour."
-      parameters:
-        - name: entity
-          in: path
-          description: "Valeurs disponibles: ___release___/___artist___/___master___) __/!\\ LA VALEUR ___vinyl___ NE FONCTIONNERA PAS /!\\__."
-          required: true
-          example: release
-          schema:
-            type: string
-        - name: idEntity
-          description: "Correspond à ___idRelease___, par exemple, et non à ___id___"
-          in: query
-          required: true
-          schema:
-            type: integer
-      responses:
-        "200":
-          description: Updated
-        "500":
-          description: Internal Server Error
 # Login ✔︎
   "/registration":
     post:
@@ -463,6 +422,7 @@ paths:
   "/artists":
     get:
       tags:
+      - MainGetters
       - Artist
       description: ""
       parameters:
@@ -1010,6 +970,7 @@ paths:
   "/labels":
     get:
       tags:
+      - MainGetters
       - Label
       description: ""
       parameters: []
@@ -1183,6 +1144,7 @@ paths:
   "/masters":
     get:
       tags:
+      - MainGetters
       - Master
       description: ""
       parameters:
@@ -2306,6 +2268,7 @@ paths:
   "/vinyls":
     get:
       tags:
+      - MainGetters
       - Vinyl
       description: ""
       parameters:

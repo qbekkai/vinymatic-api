@@ -25,7 +25,7 @@ const errorRequest = require('./src/middlewares/errorRequest.mw');
 const resultRequest = require('./src/middlewares/resultRequest.mw');
 const spotedErrorMw = require('./src/middlewares/spotedError.mw');
 
-const hostname = '0.0.0.0';
+const hostname = process.env.URL_API.replace(/https?:\/\//, '');
 const port = process.env.PORT_API;
 
 const app = express();

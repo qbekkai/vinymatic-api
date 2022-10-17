@@ -81,6 +81,30 @@ module.exports = (router) => {
           //   attributes: ["id", "idRelease", "title", "releaseDate", "thumbnail", "vinylUrl", "resourceUrl"],
           //   where
           // }
+
+          const where = !isForScrapingMaj
+            ? {
+              [Op.and]: [
+                { idRelease: { [Op.not]: null } },
+                { title: { [Op.not]: null } },
+              ]
+            }
+            : {
+              [Op.and]: [
+                {
+                  idRelease: {
+                    [Op.or]: [
+                      { [Op.is]: null },
+                      { [Op.not]: null }
+                    ]
+                  }
+                },
+                { title: { [Op.is]: null } },
+              ]
+            }
+
+          options.where = { ...where, ...options.where }
+
           const vinyls = await Vinyl.findAll(options)
           res.status(200).json({ vinyls })
         } catch (err) {

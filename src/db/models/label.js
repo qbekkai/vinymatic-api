@@ -27,8 +27,14 @@ module.exports = (sequelize, DataTypes) => {
       }
     },
     name: DataTypes.STRING,
-    thumbnail: DataTypes.STRING,
-    images: DataTypes.JSON
+    images: {
+      type: DataTypes.JSON,
+      defaultValue: []
+    },
+    thumbnail: {
+      type: DataTypes.STRING,
+      defaultValue: ''
+    },
   }, {
     sequelize,
     modelName: 'Label',

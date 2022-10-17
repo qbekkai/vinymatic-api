@@ -83,8 +83,14 @@ module.exports = (sequelize, DataTypes) => {
     },
     vinylUrl: DataTypes.STRING,
     resourceUrl: DataTypes.STRING,
-    images: DataTypes.JSON,
-    thumbnail: DataTypes.STRING,
+    images: {
+      type: DataTypes.JSON,
+      defaultValue: []
+    },
+    thumbnail: {
+      type: DataTypes.STRING,
+      defaultValue: ''
+    },
     MasterId: DataTypes.INTEGER,
     updatedAt: {
       type: DataTypes.DATE,
