@@ -51,8 +51,14 @@ module.exports = (sequelize, DataTypes) => {
     variantNames: DataTypes.JSON,
     description: DataTypes.TEXT,
     inGroups: DataTypes.JSON,
-    images: DataTypes.JSON,
-    thumbnail: DataTypes.STRING,
+    images: {
+      type: DataTypes.JSON,
+      defaultValue: []
+    },
+    thumbnail: {
+      type: DataTypes.STRING,
+      defaultValue: ''
+    },
     artistUrl: DataTypes.STRING,
     resourceUrl: DataTypes.STRING,
   }, {
