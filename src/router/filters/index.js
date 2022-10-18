@@ -34,6 +34,21 @@ module.exports = {
     return options
   },
 
+  byImagesNotNull: (query, fullOption) => {
+    const options = fullOption
+    const { isForImagesScrapingMaj } = query
+
+    if (isForImagesScrapingMaj) {
+      options.where = {
+        ...options.where,
+        images: {
+          [Op.is]: null
+        }
+      }
+    }
+    return options
+  },
+
   byVerified: (url, query, fullOption, opts = {}) => {
     const options = fullOption
     const { isForScrapingMaj, isErreurScraping } = query

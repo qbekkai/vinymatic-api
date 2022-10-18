@@ -36,9 +36,10 @@ module.exports = (router) => {
       async (req, res, next) => {
         try {
           const { query, url } = req;
-          let { getIdRelease, isNoLimitPagination, isForScrapingMaj, isErreurScraping, sort } = query;
-          isErreurScraping = isErreurScraping == 'true' ? true : false
-          isForScrapingMaj = isForScrapingMaj == 'true' ? true : false
+          let { getIdRelease, sort } = query;
+          query.isForImagesScrapingMaj = query.isForImagesScrapingMaj == 'true' ? true : false
+          query.isErreurScraping = query.isErreurScraping == 'true' ? true : false
+          query.isForScrapingMaj = query.isForScrapingMaj == 'true' ? true : false
 
 
           let options = {
@@ -51,6 +52,7 @@ module.exports = (router) => {
           }
           options = Tools.nPagination(query, options);
           // options = filters.byVerified(url, query, options)
+          options = filters.byImagesNotNull(query, options)
           options = getFilterOptions(url, query, options)
 
           // if (query.formatSize) options = filters.byFormatSize(query.formatSize, options)
@@ -82,7 +84,7 @@ module.exports = (router) => {
           //   where
           // }
 
-          const where = !isForScrapingMaj
+          const where = !query.isForScrapingMaj
             ? {
               [Op.and]: [
                 { idRelease: { [Op.not]: null } },
@@ -106,6 +108,7 @@ module.exports = (router) => {
           options.where = { ...where, ...options.where }
 
           const vinyls = await Vinyl.findAll(options)
+          // const vinyls = await Vinyl.findAndCountAll(options)
           res.status(200).json({ vinyls })
         } catch (err) {
           if (/VinymaticApiRequestError:SortNotExist/.test(err.name))
