@@ -15,6 +15,8 @@ const { haveYouThePermission } = require('../../auth/accessControl')
 const imageTools = require('../../tools/images.tool')
 const imageManagmentCall = require('../../tools/imageManagmentCall.tool')
 
+const filters = require('../filters')
+
 
 module.exports = (router) => {
   router.route('/labels')
@@ -44,10 +46,19 @@ module.exports = (router) => {
           // };
 
 
-          let { isForScrapingMaj } = query;
-          isForScrapingMaj = isForScrapingMaj == 'true' ? true : false
+          query.isForScrapingMaj = query.isForScrapingMaj == 'true' ? true : false
 
-          let where = !isForScrapingMaj
+          let options = {
+            include: [],
+            order: []
+            // raw: true
+          }
+
+          options = Tools.nPagination(query, options);
+          options = filters.byImagesNotNull(query, options)
+
+
+          let where = !query.isForScrapingMaj
             ? {
               [Op.and]: [
                 { idLabel: { [Op.not]: null } },
@@ -68,13 +79,7 @@ module.exports = (router) => {
               ]
             }
 
-
-          const paginations = Tools.pagination(query);
-          const options = {
-            ...paginations
-          }
           options.where = { ...where, ...options.where }
-
 
           const labels = await Label.findAll(options)
           res.status(200).json({ labels })

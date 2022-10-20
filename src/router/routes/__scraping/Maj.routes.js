@@ -209,7 +209,10 @@ module.exports = (router) => {
         res.status(200).json({ artist: artistFound })
       } catch (err) {
         if (/SequelizeUniqueConstraintError/i.test(err.name))
-          return res.status(400).json({ message: `Artist (idArtist: ${err.fields.idRelease}) already exist` })
+          return res.status(400).json({ message: `Artist (idArtist: ${err.fields.idRelease}) already exist.` })
+
+        if (/SequelizeEmptyResultError/i.test(err.name))
+          return res.status(404).json({ message: `Artist does not exist.` })
 
         res.status(500).json({ message: 'InternalError' })
       }

@@ -18,6 +18,7 @@ const multer = require('multer')
 const upload = multer({ dest: './src/files/uploads' })
 
 const { addFormat } = require('../../tools/format.tool')
+const filters = require('../filters')
 
 
 
@@ -50,10 +51,20 @@ module.exports = (router) => {
 
 
 
-          let { isForScrapingMaj } = query;
-          isForScrapingMaj = isForScrapingMaj == 'true' ? true : false
+          query.isForScrapingMaj = query.isForScrapingMaj == 'true' ? true : false
 
-          let where = !isForScrapingMaj
+          let options = {
+            attributes: ["id", "idArtist", "name", "thumbnail", "artistUrl"],
+            include: [],
+            order: []
+            // raw: true
+          }
+
+          const filter = Tools.filter(query, { entity: 'artist' });
+          options = Tools.nPagination(query, options);
+          options = filters.byImagesNotNull(query, options)
+
+          let where = !query.isForScrapingMaj
             ? {
               [Op.and]: [
                 { idArtist: { [Op.not]: null } },
@@ -74,21 +85,8 @@ module.exports = (router) => {
               ]
             }
 
-          const filter = Tools.filter(query, { entity: 'artist' });
-          const paginations = Tools.pagination(query);
-          const includes = {
-            ...includeEntity.routes.artist.gets,
-            include: filter.include
-          }
-          if (query && query.getIdLabel) includes.attributes = ['idArtist']
-
-          const options = {
-            ...includes,
-            ...paginations,
-            ...filter
-          }
-
-          options.where = { ...where, ...options.where }
+          options.include = [...filter.include, ...options.include]
+          options.where = { ...where, ...filter.where, ...options.where }
 
           const artists = await Artist.findAll(options)
           res.status(200).json({ artists })
