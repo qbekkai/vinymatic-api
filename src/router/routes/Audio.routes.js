@@ -16,6 +16,7 @@ const { routes: optionsForRes, minimumOfData } = require('../relations/includeEn
 const Tools = require('./../../tools/tools')
 const timeTool = require('./../../tools/time.tool')
 const ApiService = require('../../services/apiService');
+const { PostAudioController } = require('../../controllers/Files.controller');
 
 
 const upload = multer({ dest: './src/files/uploads' })
@@ -143,17 +144,26 @@ module.exports = (router) => {
           const { title: titleAudio, position: positionAudio } = audioFound
 
           // UPLOAD AUDIO IN S3 BUCKET AND SAVE IT ON DB
-          const fd = new FormData()
-          fd.append('audioFile', fs.createReadStream(file.path))
-          fd.append('typeAudio', `${typeAudio}s`)
-          fd.append('idAudio', idAudio)
-          if (titleAudio) fd.append('titleAudio', titleAudio)
-          if (positionAudio) fd.append('positionAudio', positionAudio)
-          // fd.append('audioFrom', `${audioFrom}s`)
+          // const fd = new FormData()
+          // fd.append('audioFile', fs.createReadStream(file.path))
+          // fd.append('typeAudio', `${typeAudio}s`)
+          // fd.append('idAudio', idAudio)
+          // if (titleAudio) fd.append('titleAudio', titleAudio)
+          // if (positionAudio) fd.append('positionAudio', positionAudio)
+          // // fd.append('audioFrom', `${audioFrom}s`)
 
-          const resSong = await as.doRequest('POST', `/audios`, fd)
+          // const resSong = await as.doRequest('POST', `/audios`, fd)
+
+          const paramsFile = {
+            audioFile: fs.createReadStream(file.path),
+            typeAudio: `${typeAudio}s`,
+            idAudio
+          }
+          if (titleAudio) paramsFile.titleAudio = titleAudio
+          if (positionAudio) paramsFile.positionAudio = positionAudio
+
           const imageUploaded = {
-            audioUrl: resSong.data.url
+            audioUrl: (await PostAudioController(file, paramsFile)).url
           }
 
           await Audio.update(imageUploaded, { where: { id: idAudio } })
@@ -203,9 +213,9 @@ module.exports = (router) => {
           } else songUploaded.audioUrl = null
 
 
-          // await Audio.update(songUploaded, { where: { id: idAudio } })
-          // audioFound = await Audio.findByPk(idAudio, { attributes: ["id", "title", "audioUrl"], rejectOnEmpty: true })
-          res.status(200).json({ audio: { audioUrl: songUploaded.audioUrl } })
+          await Audio.update(songUploaded, { where: { id: idAudio } })
+          audioFound = await Audio.findByPk(idAudio, { attributes: ["id", "title", "audioUrl"], rejectOnEmpty: true })
+          res.status(200).json({ audio: { audioUrl: audioFound.audioUrl } })
         } catch (err) {
           if (err.name.localeCompare(EMPTY_ERROR) === 0)
             return res.status(404).json({ message: ErrorMessage.getMessageByStatusCode(404) })
@@ -224,7 +234,7 @@ module.exports = (router) => {
           const { params: { key, typeAudio }, query: { isGetDuration } } = req
           const [, ext] = key.split(/\./)
 
-          const path = `${typeAudio}/${key}`
+          const path = `${typeAudio}/${encodeURIComponent(key)}`
           const bucketS3Service = new BucketS3Service('audio')
 
 
@@ -240,7 +250,7 @@ module.exports = (router) => {
           })
 
         } catch (err) {
-          return res.status(500).json({ message: ErrorMessage.getMessageByStatusCode(500) })
+          res.status(500).json({ message: ErrorMessage.getMessageByStatusCode(500) })
         }
       })
     .delete(
@@ -249,7 +259,7 @@ module.exports = (router) => {
           const { params } = req
           const { typeAudio, key } = params
 
-          const path = `${typeAudio}/${key}`
+          const path = `${typeAudio}/${encodeURIComponent(key)}`
           const bucketS3Service = new BucketS3Service('audio')
           await bucketS3Service.deleteFile(path)
           console.log("deleted from s3")

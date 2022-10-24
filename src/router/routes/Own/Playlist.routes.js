@@ -26,7 +26,7 @@ module.exports = (router) => {
             // attributes: ["id", "title", "duration", "image", "playlistUrl", "resourceUrl", [sequelize.fn("COUNT", sequelize.col("Audios->AudiosInPlaylist.AudioId")), "nbAudios"], [sequelize.fn("COUNT", sequelize.col("PlaylistLike->Likes.UserId")), "nbLikes"]],
             include: [
               { model: Audio, attributes: [] },
-              { model: User, as: "PlaylistLike", attributes: ["showName"] },
+              { model: User, as: "PlaylistLikes", attributes: ["showName"] },
             ],
             // group: ["Playlist.id", "Audios->AudiosInPlaylist.AudioId", "PlaylistLike->Likes.UserId"],
             ...pagination
@@ -93,9 +93,9 @@ module.exports = (router) => {
                 ],
                 through: { attributes: ["position"] }
               },
-              { model: User, as: "PlaylistLike", attributes: ["id", "username", "showName", "email", "phoneNumber", "profilImage", "role"], through: { attributes: [] } },
+              { model: User, as: "PlaylistLikes", attributes: ["id", "username", "showName", "email", "phoneNumber", "profilImage", "role"], through: { attributes: [] } },
             ],
-            group: ["Playlist.id", "Audios->AudiosInPlaylist.AudioId", "PlaylistLike->PlaylistLikes.UserId"],
+            group: ["Playlist.id", "Audios->AudiosInPlaylist.AudioId", "PlaylistLikes->PlaylistLike.UserId"],
             where: { id },
             rejectOnEmpty: true
           }
@@ -174,11 +174,11 @@ module.exports = (router) => {
           const { id } = params
 
           const options = {
-            attributes: ["id", "title", "image", "duration", "playlistUrl", "resourceUrl", [sequelize.fn("COUNT", sequelize.col("PlaylistLike->Likes.UserId")), "nbLikes"]],
+            attributes: ["id", "title", "image", "duration", "playlistUrl", "resourceUrl", [sequelize.fn("COUNT", sequelize.col("PlaylistLikes->PlaylistLike.UserId")), "nbLikes"]],
             include: [
-              { model: User, as: "PlaylistLike", attributes: ["id", "username", "showName", "email", "phoneNumber", "profilImage", "role"], through: { attributes: [] } },
+              { model: User, as: "PlaylistLikes", attributes: ["id", "username", "showName", "email", "phoneNumber", "profilImage", "role"], through: { attributes: [] } },
             ],
-            group: ["Playlist.id", "PlaylistLike->Likes.UserId"],
+            group: ["Playlist.id", "PlaylistLikes->PlaylistLike.UserId"],
             where: { id },
             rejectOnEmpty: true
           }

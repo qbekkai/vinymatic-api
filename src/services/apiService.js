@@ -18,7 +18,7 @@ class ApiService {
     };
     options.baseURL = this.baseURL;
     options.responseType = 'json';
-    options.url = encodeURI(url);
+    options.url = encodeURIComponent(url);
     if (this.token) axios.defaults.headers.common['Authorization'] = `Bearer ${this.token}`;
 
     if (/post|patch/i.test(method) && (/\/(?:images|audios|registration)$/i.test(url) || /\/(?:song|video)/i.test(url)) && data) {

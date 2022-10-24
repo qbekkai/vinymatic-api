@@ -52,7 +52,7 @@ module.exports = (sequelize, DataTypes) => {
       User.hasMany(ModifEntityRequest)
 
       /** TODO: Unifomiser Like(s) vers PlaylistLike(s) */
-      User.belongsToMany(Playlist, { through: PlaylistLike })
+      User.belongsToMany(Playlist, { as: "PlaylistLikes", through: PlaylistLike })
       User.belongsToMany(Video, { through: VideoLike, as: "VideoLikes" })
       User.belongsToMany(Vinyl, { through: VinylLike, as: "VinylLikes" })
       //   User.belongsToMany(Vinyl, { through: Selling, as: "Sells" });

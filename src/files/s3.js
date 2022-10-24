@@ -43,6 +43,7 @@ class BucketS3Service {
       Key: fileKey,
       Bucket: this.bucketName
     }
+
     const dataStream = await this.s3.getObject(downloadParams);
 
     if (!isGetDuration || (isGetDuration && isGetDuration === "false")) return dataStream.createReadStream();
@@ -70,7 +71,7 @@ class BucketS3Service {
 
       const params = {
         Bucket: BUCKET_NAME,
-        CopySource: encodeURI(`${BUCKET_NAME}/${OLD_KEY}`),
+        CopySource: `${BUCKET_NAME}/${OLD_KEY}`,
         Key: NEW_KEY
       }
 
