@@ -8,6 +8,8 @@ const { EMPTY_ERROR, REFERENCE_ERROR, MALFORMED_TOKEN_ERROR, EXPIRED_TOKEN_ERROR
 const { haveYouThePermission } = require('../../auth/accessControl')
 
 const BucketS3Service = require('../../files/s3')
+const FilesController = require('../../controllers/Files.controller')
+const { PostAudioController } = require('../../controllers/Files.controller')
 const upload = multer({ dest: './src/files/uploads' })
 
 module.exports = (router) => {
@@ -29,6 +31,7 @@ module.exports = (router) => {
           }
 
           const path = `${imageFrom}/${typeImage}/${encodeURIComponent(filename)}`
+
 
           const bucketS3Service = new BucketS3Service('image')
           const uploadResult = await bucketS3Service.uploadFile(path, file)
@@ -52,23 +55,10 @@ module.exports = (router) => {
       async (req, res, next) => {
         try {
           const { file, body } = req
-          const { typeAudio, idAudio, positionAudio } = body
-          let { titleAudio } = body
-          titleAudio = titleAudio.replace(/\s/g, '_').replace(/\//g, '-')
 
 
-          let filename = `${titleAudio}_${idAudio}I${Date.now()}D${positionAudio}P.mp3`
-          const path = `${typeAudio}/${encodeURIComponent(filename)}`
-
-          const bucketS3Service = new BucketS3Service('audio')
-          const uploadResult = await bucketS3Service.uploadFile(path, file)
-          await unlinkFile(file.path)
-
-          const imageUploaded = {
-            url: `/song/${uploadResult.Key}`,
-          }
-
-          res.status(200).json(imageUploaded)
+          const audioUploaded = await PostAudioController(file, body)
+          res.status(200).json(audioUploaded)
         } catch (err) {
           if (err.name.localeCompare(EMPTY_ERROR) === 0)
             return res.status(404).json({ message: ErrorMessage.getMessageByStatusCode(404) })
@@ -81,6 +71,7 @@ module.exports = (router) => {
     .post(
       upload.single('videoFile'),
       async (req, res, next) => {
+        s
         try {
           const { file, body } = req
           const { typeVideo, idVideo } = body
