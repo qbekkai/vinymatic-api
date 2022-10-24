@@ -16,6 +16,7 @@ const { routes: optionsForRes, minimumOfData } = require('../relations/includeEn
 const Tools = require('./../../tools/tools')
 const timeTool = require('./../../tools/time.tool')
 const ApiService = require('../../services/apiService');
+const { PostAudioController } = require('../../controllers/Files.controller');
 
 
 const upload = multer({ dest: './src/files/uploads' })
@@ -143,17 +144,26 @@ module.exports = (router) => {
           const { title: titleAudio, position: positionAudio } = audioFound
 
           // UPLOAD AUDIO IN S3 BUCKET AND SAVE IT ON DB
-          const fd = new FormData()
-          fd.append('audioFile', fs.createReadStream(file.path))
-          fd.append('typeAudio', `${typeAudio}s`)
-          fd.append('idAudio', idAudio)
-          if (titleAudio) fd.append('titleAudio', titleAudio)
-          if (positionAudio) fd.append('positionAudio', positionAudio)
-          // fd.append('audioFrom', `${audioFrom}s`)
+          // const fd = new FormData()
+          // fd.append('audioFile', fs.createReadStream(file.path))
+          // fd.append('typeAudio', `${typeAudio}s`)
+          // fd.append('idAudio', idAudio)
+          // if (titleAudio) fd.append('titleAudio', titleAudio)
+          // if (positionAudio) fd.append('positionAudio', positionAudio)
+          // // fd.append('audioFrom', `${audioFrom}s`)
 
-          const resSong = await as.doRequest('POST', `/audios`, fd)
+          // const resSong = await as.doRequest('POST', `/audios`, fd)
+
+          const paramsFile = {
+            audioFile: fs.createReadStream(file.path),
+            typeAudio: `${typeAudio}s`,
+            idAudio
+          }
+          if (titleAudio) paramsFile.titleAudio = titleAudio
+          if (positionAudio) paramsFile.positionAudio = positionAudio
+
           const imageUploaded = {
-            audioUrl: resSong.data.url
+            audioUrl: (await PostAudioController(file, paramsFile)).url
           }
 
           await Audio.update(imageUploaded, { where: { id: idAudio } })

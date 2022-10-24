@@ -6,9 +6,11 @@
   "scripts": {
     "serve:dev": "nodemon server.js",
     "serve:dev:pg": "NODE_env=devPg nodemon server.js",
-    "serve:test": "NODE_ENV=test n use 16.3.0 server.js",
-    "serve:test:debug": "NODE_ENV=test PORT_API=4001 n use 16.3.0 server.js",
-    "serve:preProd": "NODE_ENV=preProd n use 16.3.0 server.js",
+    "serve:test": "NODE_ENV=test URL_API=http://0.0.0.0 node server.js",
+    "serve:test:debug": "NODE_ENV=test URL_API=http://0.0.0.0 PORT_API=4001 node server.js",
+    "serve:staging": "NODE_ENV=staging URL_API=http://0.0.0.0 node server.js",
+    "serve:staging:debug": "NODE_ENV=staging URL_API=http://0.0.0.0 PORT_API=4001 node server.js",
+    "serve:preProd": "NODE_ENV=preProd node server.js",
     "serve:prod": "NODE_ENV=production node server.js",
     "serve:prod:debug": "PORT_API=3002 NODE_ENV=production nodemon server.js"
   },
