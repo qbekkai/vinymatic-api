@@ -203,9 +203,9 @@ module.exports = (router) => {
           } else songUploaded.audioUrl = null
 
 
-          // await Audio.update(songUploaded, { where: { id: idAudio } })
-          // audioFound = await Audio.findByPk(idAudio, { attributes: ["id", "title", "audioUrl"], rejectOnEmpty: true })
-          res.status(200).json({ audio: { audioUrl: songUploaded.audioUrl } })
+          await Audio.update(songUploaded, { where: { id: idAudio } })
+          audioFound = await Audio.findByPk(idAudio, { attributes: ["id", "title", "audioUrl"], rejectOnEmpty: true })
+          res.status(200).json({ audio: { audioUrl: audioFound.audioUrl } })
         } catch (err) {
           if (err.name.localeCompare(EMPTY_ERROR) === 0)
             return res.status(404).json({ message: ErrorMessage.getMessageByStatusCode(404) })
@@ -224,7 +224,7 @@ module.exports = (router) => {
           const { params: { key, typeAudio }, query: { isGetDuration } } = req
           const [, ext] = key.split(/\./)
 
-          const path = `${typeAudio}/${key}`
+          const path = `${typeAudio}/${encodeURIComponent(key)}`
           const bucketS3Service = new BucketS3Service('audio')
 
 
@@ -240,7 +240,7 @@ module.exports = (router) => {
           })
 
         } catch (err) {
-          return res.status(500).json({ message: ErrorMessage.getMessageByStatusCode(500) })
+          res.status(500).json({ message: ErrorMessage.getMessageByStatusCode(500) })
         }
       })
     .delete(
@@ -249,7 +249,7 @@ module.exports = (router) => {
           const { params } = req
           const { typeAudio, key } = params
 
-          const path = `${typeAudio}/${key}`
+          const path = `${typeAudio}/${encodeURIComponent(key)}`
           const bucketS3Service = new BucketS3Service('audio')
           await bucketS3Service.deleteFile(path)
           console.log("deleted from s3")
