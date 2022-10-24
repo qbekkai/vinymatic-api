@@ -15,6 +15,9 @@ const { URL_API, PORT_API, TOKEN_API } = process.env
 const ApiService = require('../../services/apiService')
 const FormData = require('form-data');
 
+const filters = require('../filters')
+
+
 
 module.exports = (router) => {
   router.route('/masters')
@@ -23,7 +26,7 @@ module.exports = (router) => {
       async (req, res, next) => {
         try {
           const { query } = req;
-          let { getIdMaster, isNoLimitPagination, isErreurScraping } = query;
+          let { getIdMaster } = query;
           // isErreurScraping = isErreurScraping == 'true' ? true : false
           // isForScrapingMaj = isForScrapingMaj == 'true' ? true : false
 
@@ -41,10 +44,21 @@ module.exports = (router) => {
           //   ...filter
           // };
 
-          let { isForScrapingMaj } = query;
-          isForScrapingMaj = isForScrapingMaj == 'true' ? true : false
+          query.isForScrapingMaj = query.isForScrapingMaj == 'true' ? true : false
 
-          let where = !isForScrapingMaj
+          let options = {
+            attributes: getIdMaster
+              ? ["idMaster"]
+              : ["id", "idMaster", "title", "releaseDate", "thumbnail", "masterUrl", "resourceUrl"],
+            include: [],
+            order: []
+            // raw: true
+          }
+
+          options = Tools.nPagination(query, options);
+          options = filters.byImagesNotNull(query, options)
+
+          let where = !query.isForScrapingMaj
             ? {
               [Op.and]: [
                 { idMaster: { [Op.not]: null } },
@@ -65,15 +79,7 @@ module.exports = (router) => {
               ]
             }
 
-
-          const paginations = Tools.pagination(query);
-          const options = {
-            attributes: ["id", "idMaster", "title", "releaseDate", "thumbnail", "masterUrl", "resourceUrl"],
-            ...paginations
-          }
-          if (getIdMaster) options.attributes = ["idMaster"]
           options.where = { ...where, ...options.where }
-
 
           const masters = await Master.findAll(options)
           res.status(200).json({ masters })

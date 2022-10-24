@@ -1,3 +1,4 @@
+const { classify } = require('inflection')
 const Models = require('../../../db/models')
 
 module.exports = (router) => {
@@ -91,6 +92,61 @@ module.exports = (router) => {
         }
       })
 
+  router.route('/s/maj/fileUrls/:entity')
+    .patch(
+      async (req, res, next) => {
+        try {
+          const { query: { isFor, idEntity } } = req
+          let { params: { entity } } = req
+
+          entity = {
+            value: entity,
+            classify: classify(entity),
+            upper: entity.toUpperCase(),
+            found: null
+          }
+
+          entity.idEntity = {
+            key: /vinyl/i.test(entity.value) ? "idRelease" : `id${entity.classify}`,
+            value: idEntity && typeof idEntity === 'string' ? +(idEntity) : idEntity
+          }
+
+          entity.toUpdate = {
+            key: isFor,
+            upper: isFor.toUpperCase()
+          }
+
+          switch (true) {
+            case /images/i.test(entity.toUpdate.key): entity.toUpdate.value = []; break;
+            case /thumbnail/i.test(entity.toUpdate.key): entity.toUpdate.value = ""; break;
+            default: break;
+          }
+
+
+          entity.found = await Models[entity.classify].findOne({ where: { [entity.idEntity.key]: [entity.idEntity.value] }, rejectOnEmpty: true })
+
+          await entity.found.update({ [entity.toUpdate.key]: entity.toUpdate.value });
+
+          entity.found = await Models.Vinyl.findByPk(entity.found.id)
+          console.log(`${entity.upper}:${entity.toUpdate.upper} UPDATED BY SCRAPING !! ( ${entity.idEntity.key}: ${entity.idEntity.value})`)
+          console.log(`------------------------------`)
+
+
+          res.status(200).json({ vinyl: entity.found })
+        } catch (err) {
+          if (/SequelizeUniqueConstraintError/i.test(err.name) && err.fields.idRelease)
+            return res.status(400).json({ message: `Vinyl (idRelease: ${err.fields.idRelease}) already exist` })
+          if (/SequelizeUniqueConstraintError/i.test(err.name) && err.fields.idMaster)
+            return res.status(400).json({ message: `Master (idMaster: ${err.fields.idMaster}) already exist` })
+          if (/SequelizeUniqueConstraintError/i.test(err.name) && err.fields.idLabel)
+            return res.status(400).json({ message: `Label (idLabel: ${err.fields.idLabel}) already exist` })
+          if (/SequelizeUniqueConstraintError/i.test(err.name) && err.fields.idArtist)
+            return res.status(400).json({ message: `Artist (idArtist: ${err.fields.idArtist}) already exist` })
+
+          res.status(500).json({ message: 'InternalError' })
+        }
+      })
+
   router.route('/s/maj/label')
     .patch(async (req, res, next) => {
       try {
@@ -153,7 +209,10 @@ module.exports = (router) => {
         res.status(200).json({ artist: artistFound })
       } catch (err) {
         if (/SequelizeUniqueConstraintError/i.test(err.name))
-          return res.status(400).json({ message: `Artist (idArtist: ${err.fields.idRelease}) already exist` })
+          return res.status(400).json({ message: `Artist (idArtist: ${err.fields.idRelease}) already exist.` })
+
+        if (/SequelizeEmptyResultError/i.test(err.name))
+          return res.status(404).json({ message: `Artist does not exist.` })
 
         res.status(500).json({ message: 'InternalError' })
       }

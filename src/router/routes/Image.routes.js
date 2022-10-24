@@ -107,7 +107,7 @@ module.exports = (router) => {
 
           const path = `${imageFrom}/${typeImage}`
           const bucketS3Service = new BucketS3Service('image')
-          const getResult = await bucketS3Service.getFile(`${path}/${key}`)
+          const getResult = await bucketS3Service.getFile(`${path}/${encodeURIComponent(key)}`)
 
           getResult.pipe(res)
         } catch (err) {
@@ -123,7 +123,7 @@ module.exports = (router) => {
           const { params } = req
           const { imageFrom, typeImage, key } = params
 
-          const path = `${imageFrom}/${typeImage}/${key}`
+          const path = `${imageFrom}/${typeImage}/${encodeURIComponent(key)}`
           const bucketS3Service = new BucketS3Service('image')
           await bucketS3Service.deleteFile(path)
           console.log("deleted from s3")
