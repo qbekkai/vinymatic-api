@@ -70,9 +70,10 @@ module.exports = (router) => {
           const { id } = params
 
           const options = {
-            attributes: ["id", "title", "description", "duration", "image", "playlistUrl", "resourceUrl", [sequelize.fn('COUNT', sequelize.col('PlaylistLike.id')), 'like']],
+            attributes: ["id", "title", "description", "duration", "image", "playlistUrl", "resourceUrl", [sequelize.fn('COUNT', sequelize.col('PlaylistLikes.id')), 'like']],
+            // attributes: ["id", "title", "description", "duration", "image", "playlistUrl", "resourceUrl"],
             include: [
-              { model: User, as: "Owner", attributes: ["id", "username", "showName", "email", "phoneNumber", "profilImage", "role"] },
+              // { model: User, as: "Owner", attributes: ["id", "username", "showName", "email", "phoneNumber", "profilImage", "role"] },
               {
                 model: Audio,
                 attributes: ["id", "title", "image", "duration", "audioUrl", "resourceUrl"],
@@ -82,9 +83,9 @@ module.exports = (router) => {
                 ],
                 through: { attributes: ["position"] }
               },
-              { model: User, as: "PlaylistLike", attributes: ["id", "username", "showName", "email", "phoneNumber", "profilImage", "role"], through: { attributes: [] } },
+              { model: User, as: "PlaylistLikes", attributes: ["id", "username", "showName", "email", "phoneNumber", "profilImage", "role"], through: { attributes: [] } },
             ],
-            group: ['PlaylistLike.id', 'Audios.id'],
+            group: ['PlaylistLikes.id', 'Audios.id'],
             rejectOnEmpty: true
           }
           const playlistFound = await Playlist.findByPk(id, options)
@@ -92,7 +93,7 @@ module.exports = (router) => {
 
           next()
         } catch (err) {
-          if (err.name.localeCompare(EMPTY_ERROR) === 0)
+          if (/SequelizeEmptyResultError/.test(err.name))
             return res.status(404).json({ message: ErrorMessage.getMessageByStatusCode(404) })
 
           return res.status(500).json({ message: ErrorMessage.getMessageByStatusCode(500) })
@@ -109,7 +110,7 @@ module.exports = (router) => {
           const playlistFound = await Playlist.findByPk(id, {
             attributes: ["id", "title", "duration", "image", "playlistUrl", "resourceUrl"],
             include: [
-              { model: User, as: "PlaylistLike", attributes: ["id", "username", "showName", "email", "phoneNumber", "profilImage", "role"], through: { attributes: [] } },
+              { model: User, as: "PlaylistLikes", attributes: ["id", "username", "showName", "email", "phoneNumber", "profilImage", "role"], through: { attributes: [] } },
             ], rejectOnEmpty: true
           })
           res.status(200).json({ playlist: playlistFound })

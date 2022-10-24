@@ -16,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
       Playlist.belongsTo(User, { as: 'Owner', foreignKey: 'UserId' })
 
       Playlist.belongsToMany(Audio, { through: AudiosInPlaylist })
-      Playlist.belongsToMany(User, { through: PlaylistLike })
+      Playlist.belongsToMany(User, { as: "PlaylistLikes", through: PlaylistLike })
 
     }
   }

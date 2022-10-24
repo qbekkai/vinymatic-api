@@ -355,7 +355,7 @@ module.exports = {
             ],
             through: { attributes: ["position"] }
           },
-          { model: User, as: "PlaylistLike", attributes: [], through: { attributes: [] } },
+          { model: User, as: "PlaylistLikes", attributes: [], through: { attributes: [] } },
           { model: User, as: "Owner", attributes: ["username", "firstName", "lastName", "showName", "profilImage"] }
         ],
         group: ['Like.id', 'Audios.id']
